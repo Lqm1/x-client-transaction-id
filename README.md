@@ -69,7 +69,7 @@ await transaction.initialize();
 // Generate a transaction ID
 const transactionId = await transaction.generateTransactionId(
   "POST", // HTTP method
-  "/i/api/graphql/abcdefg/TweetDetail" // API path
+  "/graphql/abcdefg/TweetDetail" // API path
 );
 ```
 

@@ -69,7 +69,7 @@ await transaction.initialize();
 // トランザクションIDを生成
 const transactionId = await transaction.generateTransactionId(
   "POST", // HTTPメソッド
-  "/i/api/graphql/abcdefg/TweetDetail" // APIパス
+  "/graphql/abcdefg/TweetDetail" // APIパス
 );
 ```
 
