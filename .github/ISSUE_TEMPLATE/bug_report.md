@@ -1,38 +1,48 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
+name: Bug Report
+about: Create a bug report to help us improve the library
+title: '[BUG] '
+labels: 'bug'
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Description
+A clear and concise description of the bug.
 
-**To Reproduce**
+## Reproduction Steps
 Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
+1. Use code '...'
+2. Execute '...'
+3. Observe '...'
 4. See error
 
-**Expected behavior**
+## Expected Behavior
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
+## Actual Behavior
+A description of what actually happened.
+
+## Code Sample
+If possible, provide a code sample that reproduces the issue:
+
+```ts
+// Your code here
+```
+
+## Environment Information
+- OS: [e.g. Windows 11, macOS 13.4, Ubuntu 22.04]
+- JavaScript Runtime:
+  - [ ] Deno (version: ___)
+  - [ ] Node.js (version: ___)
+  - [ ] Bun (version: ___)
+  - [ ] Other: _______ (version: ___)
+- Library version: [e.g. 0.1.0]
+- X API endpoint: [e.g. /1.1/jot/client_event.json]
+- HTTP method: [e.g. GET, POST]
+
+## Screenshots
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+## Additional Context
+Add any other context about the problem here (error messages, logs, etc.).
