@@ -4,7 +4,6 @@
     "jsr:@std/assert@^1.0.13": "1.0.13",
     "jsr:@std/encoding@^1.0.10": "1.0.10",
     "jsr:@std/internal@^1.0.6": "1.0.6",
-    "npm:ky@^1.8.1": "1.8.1",
     "npm:linkedom@~0.18.9": "0.18.9"
   },
   "jsr": {
@@ -83,9 +82,6 @@
         "domutils",
         "entities@6.0.0"
       ]
-    },
-    "ky@1.8.1": {
-      "integrity": "sha512-7Bp3TpsE+L+TARSnnDpk3xg8Idi8RwSLdj6CMbNWoOARIrGrbuLGusV0dYwbZOm4bB3jHNxSw8Wk/ByDqJEnDw=="
     },
     "linkedom@0.18.9": {
       "integrity": "sha512-Pfvhwjs46nBrcQdauQjMXDJZqj6VwN7KStT84xQqmIgD9bPH6UVJ/ESW8y4VHVF2h7di0/P+f4Iln4U5emRcmg==",
@@ -182,7 +178,6 @@
     "dependencies": [
       "jsr:@std/assert@^1.0.13",
       "jsr:@std/encoding@^1.0.10",
-      "npm:ky@^1.8.1",
       "npm:linkedom@~0.18.9"
     ]
   }

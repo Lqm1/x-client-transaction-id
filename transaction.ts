@@ -97,17 +97,7 @@ class ClientTransaction {
     const response = homePageDocument || this.homePageDocument;
 
     // Extract content from response as string
-    let responseStr = "";
-
-    if (typeof response === "string") {
-      responseStr = response;
-    } else if (response.documentElement) {
-      // Handle Document object
-      responseStr = response.documentElement.outerHTML;
-    } else {
-      // Handle other object types
-      responseStr = response.toString ? response.toString() : "";
-    }
+    const responseStr = response.documentElement.outerHTML;
 
     const onDemandFileMatch = ON_DEMAND_FILE_REGEX.exec(responseStr);
 
