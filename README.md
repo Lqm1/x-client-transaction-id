@@ -5,6 +5,8 @@ Client Transaction ID generator library for X (formerly Twitter) API requests
 [![jsr](https://jsr.io/badges/@lami/x-client-transaction-id)](https://jsr.io/@lami/x-client-transaction-id)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+[English](README.md) | [日本語](README_JA.md) | [中文](README_CN.md)
+
 ## Overview
 
 This library provides functionality to generate the `x-client-transaction-id` header value required for X (formerly Twitter) API requests. This transaction ID is necessary when making authenticated requests to X APIs.
@@ -141,6 +143,12 @@ async function handleXMigration(): Promise<Document>
 ```
 
 Retrieves the X (Twitter) homepage and returns a DOM-parsed Document object. This makes it easy to get the document needed for ClientTransaction initialization.
+
+## Disclaimer
+
+This library is provided "as is" without warranty of any kind, either express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement. In no event shall the authors or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort or otherwise, arising from, out of, or in connection with the library or the use or other dealings in the library.
+
+This is an unofficial library and is not affiliated with, endorsed, or sponsored by X Corp. (formerly Twitter, Inc.). All X/Twitter-related trademarks and copyrights belong to X Corp. This project is intended for educational and personal use only. Users of this library are responsible for ensuring their usage complies with X's terms of service and developer policies.
 
 ## License
 

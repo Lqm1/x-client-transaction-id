@@ -5,6 +5,8 @@ X（旧Twitter）APIリクエスト用のクライアントトランザクショ
 [![jsr](https://jsr.io/badges/@lami/x-client-transaction-id)](https://jsr.io/@lami/x-client-transaction-id)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+[English](README.md) | [日本語](README_JA.md) | [中文](README_CN.md)
+
 ## 概要
 
 このライブラリは、X（旧Twitter）のAPIリクエストで必要となる`x-client-transaction-id`ヘッダーの値を生成するための機能を提供します。このトランザクションIDは、X APIに対する認証済みリクエストを行う際に必要となります。
@@ -141,6 +143,12 @@ async function handleXMigration(): Promise<Document>
 ```
 
 X（Twitter）のホームページを取得し、DOMパースしたDocumentオブジェクトを返します。ClientTransactionの初期化に必要なドキュメントを簡単に取得できます。
+
+## 免責事項
+
+このライブラリは、明示または黙示を問わず、商品性、特定目的への適合性、および非侵害性の保証を含むがこれに限定されない、いかなる種類の保証もなく「現状のまま」提供されています。著者または著作権所有者は、契約行為、不法行為、またはそれ以外であっても、ライブラリまたはライブラリの使用またはその他の取引から生じる、いかなるクレーム、損害、またはその他の責任について責任を負いません。
+
+これは非公式のライブラリであり、X Corp.（旧Twitter, Inc.）と提携、承認、またはスポンサーされているものではありません。X/Twitterに関連するすべての商標および著作権はX Corp.に帰属します。このプロジェクトは教育および個人使用のみを目的としています。このライブラリのユーザーは、使用がXの利用規約および開発者ポリシーに準拠していることを確認する責任があります。
 
 ## ライセンス
 
