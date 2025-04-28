@@ -40,6 +40,11 @@ async function handleXMigration(): Promise<Document> {
   const response = await fetch("https://x.com", {
     headers,
   });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch X homepage: ${response.statusText}`);
+  }
+
   const htmlText = await response.text();
 
   // Parse HTML using linkedom
@@ -64,6 +69,13 @@ async function handleXMigration(): Promise<Document> {
   if (migrationRedirectionUrl) {
     // Follow redirection URL
     const redirectResponse = await fetch(migrationRedirectionUrl[0]);
+
+    if (!redirectResponse.ok) {
+      throw new Error(
+        `Failed to follow migration redirection: ${redirectResponse.statusText}`
+      );
+    }
+
     const redirectHtml = await redirectResponse.text();
     dom = parseHTML(redirectHtml);
     document = dom.window.document;
@@ -97,6 +109,12 @@ async function handleXMigration(): Promise<Document> {
       body: requestPayload,
       headers,
     });
+
+    if (!formResponse.ok) {
+      throw new Error(
+        `Failed to submit migration form: ${formResponse.statusText}`
+      );
+    }
 
     const formHtml = await formResponse.text();
     dom = parseHTML(formHtml);

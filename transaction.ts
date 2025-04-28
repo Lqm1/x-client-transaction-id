@@ -107,6 +107,13 @@ class ClientTransaction {
       try {
         // Fetch ondemand file
         const onDemandFileResponse = await fetch(onDemandFileUrl);
+
+        if (!onDemandFileResponse.ok) {
+          throw new Error(
+            `Failed to fetch ondemand file: ${onDemandFileResponse.statusText}`
+          );
+        }
+
         const responseText = await onDemandFileResponse.text();
 
         // Extract indices using regex
