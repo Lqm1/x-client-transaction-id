@@ -4,7 +4,7 @@
  * This module provides helper functions for handling X domain migration,
  * number conversions, and other utility operations.
  */
-import { parseHTML } from "linkedom/worker";
+import { parseHTML } from "linkedom";
 
 /**
  * Handles X.com domain migration process and returns the HTML document
