@@ -11,12 +11,44 @@ X（旧Twitter）APIリクエスト用のクライアントトランザクショ
 
 ## インストール
 
-### JSR（Deno）
+### パッケージマネージャー
+
+#### NPM / PNPM / Yarn
+```bash
+# NPM
+npx jsr add @lami/x-client-transaction-id
+
+# PNPM
+pnpm i jsr:@lami/x-client-transaction-id
+
+# Yarn
+yarn add jsr:@lami/x-client-transaction-id
+```
+
+#### Deno
+```bash
+deno add jsr:@lami/x-client-transaction-id
+```
+
+#### Bun
+```bash
+bunx jsr add @lami/x-client-transaction-id
+```
+
+### インポート
 
 ```ts
 // import maps
 import { ClientTransaction } from "jsr:@lami/x-client-transaction-id@0.1.0";
 ```
+
+## ランタイム互換性
+
+このライブラリは以下のランタイムでの動作が確認されています：
+- Node.js
+- Deno
+- Bun
+- Cloudflare Workers
 
 ## 使用方法
 

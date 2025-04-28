@@ -11,12 +11,44 @@ This library provides functionality to generate the `x-client-transaction-id` he
 
 ## Installation
 
-### JSR (Deno)
+### Package Managers
+
+#### NPM / PNPM / Yarn
+```bash
+# NPM
+npx jsr add @lami/x-client-transaction-id
+
+# PNPM
+pnpm i jsr:@lami/x-client-transaction-id
+
+# Yarn
+yarn add jsr:@lami/x-client-transaction-id
+```
+
+#### Deno
+```bash
+deno add jsr:@lami/x-client-transaction-id
+```
+
+#### Bun
+```bash
+bunx jsr add @lami/x-client-transaction-id
+```
+
+### Import
 
 ```ts
 // import maps
 import { ClientTransaction } from "jsr:@lami/x-client-transaction-id@0.1.0";
 ```
+
+## Runtime Compatibility
+
+This library has been tested and confirmed to work with the following runtimes:
+- Node.js
+- Deno
+- Bun
+- Cloudflare Workers
 
 ## Usage
 
