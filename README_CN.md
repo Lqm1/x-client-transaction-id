@@ -107,6 +107,66 @@ const transactionId = await transaction.generateTransactionId(
 );
 ```
 
+## 高级用法：稳定化交易ID生成
+
+### 使用预生成的密钥对
+
+您可以通过使用来自外部源的预生成密钥对（验证密钥和动画密钥）来稳定交易ID的生成：
+
+```ts
+import { ClientTransaction, handleXMigration } from "@lami/x-client-transaction-id";
+
+// 获取X主页HTML文档
+const document = await handleXMigration();
+
+// 创建并初始化ClientTransaction实例
+const transaction = await ClientTransaction.create(document);
+
+// 从外部源获取预生成的密钥对
+const keyPairs = await (
+  await fetch(
+    "https://raw.githubusercontent.com/Lqm1/x-client-transaction-id-pair-dict/refs/heads/main/pair.json"
+  )
+).json();
+const keyPair = keyPairs[Math.floor(Math.random() * keyPairs.length)];
+
+// 使用固定密钥对生成交易ID
+const transactionId = await transaction.generateTransactionId(
+  "GET",
+  "/1.1/jot/client_event.json",
+  undefined,
+  keyPair.verification,
+  keyPair.animationKey
+);
+```
+
+### 风险警告
+
+使用预生成或固定的密钥对存在潜在风险：
+- 密钥和动画密钥是在浏览器内部计算的值，共享或使用固定值可能会使您面临被列入黑名单的风险。
+- 如果共享或固定的密钥对被X列入黑名单，可能会导致账户暂停或锁定。
+- X可能随时更改其验证系统，可能会使预生成的密钥失效。
+
+### 建议
+
+1. **更安全的选择**：分叉密钥对生成仓库并生成您自己的唯一密钥对。
+2. **默认选择**：不指定密钥，使用包的内置生成过程（如基本示例中所示）。
+
+### 方法比较
+
+| 方法 | 优势 | 劣势 |
+|----------|------------|---------------|
+| 使用预生成密钥 | 更稳定的x-client-transaction-id生成 | 如果密钥被广泛共享，则有被列入黑名单的风险 |
+| 内置生成 | 完全唯一的密钥和动画密钥 | 方法可能不太稳定，可能降低请求成功率 |
+
+### 为什么包内部生成不稳定？
+
+包内部生成方法的不稳定主要是由于animationKey的生成过程可能不稳定。animationKey的生成依赖于浏览器中的动画计算，这些计算可能会因环境、运行时或其他因素而变化，导致生成的密钥对不一致或无效。这可能会导致API请求失败（通常是404错误）。
+
+如果在使用内置生成方法时遇到404错误，建议实现重试机制。
+
+**我们欢迎您对改进animationKey生成算法的贡献！如果您有任何想法或改进，请随时提交拉取请求（PR）。**
+
 ## 主要功能
 
 - `ClientTransaction`：用于生成X API请求交易ID的主类

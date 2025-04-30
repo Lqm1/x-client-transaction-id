@@ -361,7 +361,9 @@ class ClientTransaction {
     ];
 
     key = key || this.key || this.getKey(response);
-    const keyBytes = this.keyBytes || this.getKeyBytes(key);
+    const keyBytes = key
+      ? this.getKeyBytes(key)
+      : this.keyBytes || this.getKeyBytes(key);
     animationKey =
       animationKey ||
       this.animationKey ||
