@@ -1,8 +1,9 @@
-# @lami/x-client-transaction-id
+# x-client-transaction-id
 
 用于X（前身为Twitter）API请求的客户端交易ID生成库
 
 [![jsr](https://jsr.io/badges/@lami/x-client-transaction-id)](https://jsr.io/@lami/x-client-transaction-id)
+[![npm](https://img.shields.io/npm/v/x-client-transaction-id)](https://www.npmjs.com/package/x-client-transaction-id)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 [English](README.md) | [日本語](README_JA.md) | [中文](README_CN.md)
@@ -18,23 +19,23 @@
 #### NPM / PNPM / Yarn
 ```bash
 # NPM
-npx jsr add @lami/x-client-transaction-id
+npm i x-client-transaction-id
 
 # PNPM
-pnpm i jsr:@lami/x-client-transaction-id
+pnpm i x-client-transaction-id
 
 # Yarn
-yarn add jsr:@lami/x-client-transaction-id
+yarn add x-client-transaction-id
 ```
 
 #### Deno
 ```bash
-deno add jsr:@lami/x-client-transaction-id
+deno add npm:x-client-transaction-id
 ```
 
 #### Bun
 ```bash
-bunx jsr add @lami/x-client-transaction-id
+bun add x-client-transaction-id
 ```
 
 ### 导入
@@ -57,7 +58,7 @@ import { ClientTransaction } from "jsr:@lami/x-client-transaction-id@0.1.0";
 ### 基本示例
 
 ```ts
-import { ClientTransaction, handleXMigration } from "@lami/x-client-transaction-id";
+import { ClientTransaction, handleXMigration } from "x-client-transaction-id";
 
 // 获取X主页HTML文档（使用实用函数）
 const document = await handleXMigration();
@@ -88,7 +89,7 @@ const apiResponse = await fetch("https://api.twitter.com/1.1/jot/client_event.js
 ### 手动获取文档
 
 ```ts
-import { ClientTransaction } from "@lami/x-client-transaction-id";
+import { ClientTransaction } from "x-client-transaction-id";
 
 // 获取Twitter主页HTML文档
 const response = await fetch("https://twitter.com/");

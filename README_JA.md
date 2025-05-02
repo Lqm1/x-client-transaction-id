@@ -1,8 +1,9 @@
-# @lami/x-client-transaction-id
+# x-client-transaction-id
 
 X（旧Twitter）APIリクエスト用のクライアントトランザクションID生成ライブラリ
 
 [![jsr](https://jsr.io/badges/@lami/x-client-transaction-id)](https://jsr.io/@lami/x-client-transaction-id)
+[![npm](https://img.shields.io/npm/v/x-client-transaction-id)](https://www.npmjs.com/package/x-client-transaction-id)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 [English](README.md) | [日本語](README_JA.md) | [中文](README_CN.md)
@@ -18,23 +19,23 @@ X（旧Twitter）APIリクエスト用のクライアントトランザクショ
 #### NPM / PNPM / Yarn
 ```bash
 # NPM
-npx jsr add @lami/x-client-transaction-id
+npm i x-client-transaction-id
 
 # PNPM
-pnpm i jsr:@lami/x-client-transaction-id
+pnpm i x-client-transaction-id
 
 # Yarn
-yarn add jsr:@lami/x-client-transaction-id
+yarn add x-client-transaction-id
 ```
 
 #### Deno
 ```bash
-deno add jsr:@lami/x-client-transaction-id
+deno add npm:x-client-transaction-id
 ```
 
 #### Bun
 ```bash
-bunx jsr add @lami/x-client-transaction-id
+bun add x-client-transaction-id
 ```
 
 ### インポート
@@ -57,7 +58,7 @@ import { ClientTransaction } from "jsr:@lami/x-client-transaction-id@0.1.0";
 ### 基本的な使用例
 
 ```ts
-import { ClientTransaction, handleXMigration } from "@lami/x-client-transaction-id";
+import { ClientTransaction, handleXMigration } from "x-client-transaction-id";
 
 // XのホームページのHTMLドキュメントを取得（ユーティリティ関数を使用）
 const document = await handleXMigration();
@@ -88,7 +89,7 @@ const apiResponse = await fetch("https://api.twitter.com/1.1/jot/client_event.js
 ### 手動でのドキュメント取得
 
 ```ts
-import { ClientTransaction } from "@lami/x-client-transaction-id";
+import { ClientTransaction } from "x-client-transaction-id";
 
 // TwitterのホームページのHTMLドキュメントを取得
 const response = await fetch("https://twitter.com/");
