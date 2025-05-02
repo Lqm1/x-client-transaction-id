@@ -311,9 +311,10 @@ class ClientTransaction {
     const rowIndex = keyBytes[this.DEFAULT_ROW_INDEX] % 16;
 
     // Generate frame time using key byte indices
-    const frameTime = this.DEFAULT_KEY_BYTES_INDICES.reduce((num1, num2) => {
+    let frameTime = this.DEFAULT_KEY_BYTES_INDICES.reduce((num1, num2) => {
       return num1 * (keyBytes[num2] % 16);
     }, 1);
+    frameTime = Math.round(frameTime / 10) * 10;
 
     const arr = this.get2dArray(keyBytes, response);
     if (!arr || !arr[rowIndex]) {
