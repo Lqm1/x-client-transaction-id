@@ -304,9 +304,9 @@ class ClientTransaction {
   private getAnimationKey(keyBytes: number[], response?: Document): string {
     const totalTime = 4096;
 
-    if (this.DEFAULT_ROW_INDEX === null || this.DEFAULT_KEY_BYTES_INDICES === null) {
+    if (this.DEFAULT_ROW_INDEX == null || this.DEFAULT_KEY_BYTES_INDICES == null) {
       throw new Error("Indices not initialized");
-  }
+    }
 
     const rowIndex = keyBytes[this.DEFAULT_ROW_INDEX] % 16;
 
