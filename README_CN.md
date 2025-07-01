@@ -10,13 +10,15 @@
 
 ## 概述
 
-该库提供了生成X（前身为Twitter）API请求所需的`x-client-transaction-id`头部值的功能。在向X API发送验证请求时，此交易ID是必需的。
+该库提供了生成X（前身为Twitter）API请求所需的`x-client-transaction-id`头部值的功能。在向X
+API发送验证请求时，此交易ID是必需的。
 
 ## 安装
 
 ### 包管理器
 
 #### NPM / PNPM / Yarn
+
 ```bash
 # NPM
 npm i x-client-transaction-id
@@ -29,11 +31,13 @@ yarn add x-client-transaction-id
 ```
 
 #### Deno
+
 ```bash
 deno add npm:x-client-transaction-id
 ```
 
 #### Bun
+
 ```bash
 bun add x-client-transaction-id
 ```
@@ -48,6 +52,7 @@ import { ClientTransaction } from "jsr:@lami/x-client-transaction-id@0.1.0";
 ## 运行时兼容性
 
 该库已在以下运行时环境中测试并确认可用：
+
 - Node.js
 - Deno
 - Bun
@@ -69,7 +74,7 @@ const transaction = await ClientTransaction.create(document);
 // 生成交易ID
 const transactionId = await transaction.generateTransactionId(
   "GET", // HTTP方法
-  "/1.1/jot/client_event.json" // API路径
+  "/1.1/jot/client_event.json", // API路径
 );
 
 console.log("Transaction ID:", transactionId);
@@ -80,10 +85,13 @@ const headers = {
   // 其他必需的头部
 };
 
-const apiResponse = await fetch("https://api.twitter.com/1.1/jot/client_event.json", {
-  method: "GET",
-  headers
-});
+const apiResponse = await fetch(
+  "https://api.twitter.com/1.1/jot/client_event.json",
+  {
+    method: "GET",
+    headers,
+  },
+);
 ```
 
 ### 手动获取文档
@@ -104,7 +112,7 @@ await transaction.initialize();
 // 生成交易ID
 const transactionId = await transaction.generateTransactionId(
   "POST", // HTTP方法
-  "/graphql/abcdefg/TweetDetail" // API路径
+  "/graphql/abcdefg/TweetDetail", // API路径
 );
 ```
 
@@ -140,7 +148,7 @@ constructor(homePageDocument: Document)
 ### `handleXMigration`
 
 ```ts
-async function handleXMigration(): Promise<Document>
+async function handleXMigration(): Promise<Document>;
 ```
 
 检索X（Twitter）主页并返回DOM解析的Document对象。这使得获取ClientTransaction初始化所需的文档变得容易。
@@ -149,7 +157,9 @@ async function handleXMigration(): Promise<Document>
 
 本库按"原样"提供，不提供任何形式的明示或暗示的保证，包括但不限于对适销性、特定目的的适用性和非侵权性的保证。在任何情况下，作者或版权所有者均不对任何索赔、损害或其他责任负责，无论是在合同诉讼、侵权行为或其他方面，由库或库的使用或其他交易引起或与之相关。
 
-这是一个非官方库，未与X Corp.（前身为Twitter, Inc.）关联、认可或赞助。所有与X/Twitter相关的商标和版权均归X Corp.所有。本项目仅供教育和个人使用。本库的用户有责任确保其使用符合X的服务条款和开发者政策。
+这是一个非官方库，未与X Corp.（前身为Twitter,
+Inc.）关联、认可或赞助。所有与X/Twitter相关的商标和版权均归X
+Corp.所有。本项目仅供教育和个人使用。本库的用户有责任确保其使用符合X的服务条款和开发者政策。
 
 ## 许可证
 

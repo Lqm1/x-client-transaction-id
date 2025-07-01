@@ -54,7 +54,7 @@ async function handleXMigration(): Promise<Document> {
   // Check for migration redirection links
   const migrationRedirectionRegex = new RegExp(
     "(http(?:s)?://(?:www\\.)?(twitter|x){1}\\.com(/x)?/migrate([/?])?tok=[a-zA-Z0-9%\\-_]+)+",
-    "i"
+    "i",
   );
 
   const metaRefresh = document.querySelector("meta[http-equiv='refresh']");
@@ -62,8 +62,7 @@ async function handleXMigration(): Promise<Document> {
     ? metaRefresh.getAttribute("content") || ""
     : "";
 
-  const migrationRedirectionUrl =
-    migrationRedirectionRegex.exec(metaContent) ||
+  const migrationRedirectionUrl = migrationRedirectionRegex.exec(metaContent) ||
     migrationRedirectionRegex.exec(htmlText);
 
   if (migrationRedirectionUrl) {
@@ -72,7 +71,7 @@ async function handleXMigration(): Promise<Document> {
 
     if (!redirectResponse.ok) {
       throw new Error(
-        `Failed to follow migration redirection: ${redirectResponse.statusText}`
+        `Failed to follow migration redirection: ${redirectResponse.statusText}`,
       );
     }
 
@@ -82,13 +81,12 @@ async function handleXMigration(): Promise<Document> {
   }
 
   // Handle migration form if present
-  const migrationForm =
-    document.querySelector("form[name='f']") ||
+  const migrationForm = document.querySelector("form[name='f']") ||
     document.querySelector("form[action='https://x.com/x/migrate']");
 
   if (migrationForm) {
-    const url =
-      migrationForm.getAttribute("action") || "https://x.com/x/migrate";
+    const url = migrationForm.getAttribute("action") ||
+      "https://x.com/x/migrate";
     const method = migrationForm.getAttribute("method") || "POST";
 
     // Collect form input fields
@@ -112,7 +110,7 @@ async function handleXMigration(): Promise<Document> {
 
     if (!formResponse.ok) {
       throw new Error(
-        `Failed to submit migration form: ${formResponse.statusText}`
+        `Failed to submit migration form: ${formResponse.statusText}`,
       );
     }
 
@@ -186,4 +184,4 @@ function isOdd(num: number): number {
   return 0.0;
 }
 
-export { handleXMigration, floatToHex, isOdd };
+export { floatToHex, handleXMigration, isOdd };

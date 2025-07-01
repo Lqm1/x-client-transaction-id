@@ -5,7 +5,7 @@
  * ClientTransaction class and transaction ID generation.
  */
 import { assertEquals } from "@std/assert";
-import { handleXMigration, ClientTransaction } from "./mod.ts";
+import { ClientTransaction, handleXMigration } from "./mod.ts";
 
 /**
  * Test to verify the transaction ID generation process
@@ -57,7 +57,7 @@ Deno.test(
             "x-twitter-active-user": "yes",
             "x-twitter-client-language": "ja",
           },
-        }
+        },
       );
 
     // Act: Generate multiple transaction IDs and test them
@@ -73,7 +73,7 @@ Deno.test(
 
       if (!guestToken) {
         console.error(
-          `Request ${i + 1}: Failed to extract guest token from the document`
+          `Request ${i + 1}: Failed to extract guest token from the document`,
         );
         continue;
       }
@@ -87,7 +87,7 @@ Deno.test(
       // Generate transaction ID with the fresh ClientTransaction instance
       const transactionId = await ct.generateTransactionId(
         request.method,
-        new URL(request.url).pathname
+        new URL(request.url).pathname,
       );
       request.headers.set("x-client-transaction-id", transactionId);
 
@@ -102,9 +102,9 @@ Deno.test(
           console.log(`Request ${i + 1}/${totalRequests}: Success`);
         } else {
           console.error(
-            `Request ${i + 1}/${totalRequests}: Failed with status: ${
-              response.status
-            }`
+            `Request ${
+              i + 1
+            }/${totalRequests}: Failed with status: ${response.status}`,
           );
           if (response.status === 404) {
             notFoundErrors++;
@@ -119,16 +119,20 @@ Deno.test(
     }
 
     console.log(
-      `Successful requests: ${successfulRequests}/${totalRequests} (${(
-        (successfulRequests / totalRequests) *
-        100
-      ).toFixed(2)}%)`
+      `Successful requests: ${successfulRequests}/${totalRequests} (${
+        (
+          (successfulRequests / totalRequests) *
+          100
+        ).toFixed(2)
+      }%)`,
     );
     console.log(
-      `404 Not Found errors: ${notFoundErrors}/${totalRequests} (${(
-        (notFoundErrors / totalRequests) *
-        100
-      ).toFixed(2)}%)`
+      `404 Not Found errors: ${notFoundErrors}/${totalRequests} (${
+        (
+          (notFoundErrors / totalRequests) *
+          100
+        ).toFixed(2)
+      }%)`,
     );
 
     if (
@@ -136,10 +140,10 @@ Deno.test(
       notFoundErrors === totalRequests
     ) {
       console.warn(
-        "Possible rate limiting detected. Try opening any user profile page in Chrome to verify."
+        "Possible rate limiting detected. Try opening any user profile page in Chrome to verify.",
       );
       console.warn(
-        "If rate limiting is occurring, errors will also appear in the browser."
+        "If rate limiting is occurring, errors will also appear in the browser.",
       );
     }
 
@@ -147,7 +151,7 @@ Deno.test(
     assertEquals(
       successfulRequests,
       totalRequests,
-      `All ${totalRequests} requests must succeed. Only ${successfulRequests} succeeded.`
+      `All ${totalRequests} requests must succeed. Only ${successfulRequests} succeeded.`,
     );
-  }
+  },
 );

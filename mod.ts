@@ -13,20 +13,20 @@ import ClientTransaction from "./transaction.ts";
 import Cubic from "./cubic.ts";
 import { interpolate, interpolateNum } from "./interpolate.ts";
 import { convertRotationToMatrix } from "./rotation.ts";
-import { handleXMigration, floatToHex, isOdd } from "./utils.ts";
-import { encodeBase64, decodeBase64 } from "@std/encoding";
+import { floatToHex, handleXMigration, isOdd } from "./utils.ts";
+import { decodeBase64, encodeBase64 } from "@std/encoding";
 
 export {
   ClientTransaction,
+  convertRotationToMatrix,
   Cubic,
+  decodeBase64,
+  encodeBase64,
+  floatToHex,
+  handleXMigration,
   interpolate,
   interpolateNum,
-  convertRotationToMatrix,
-  handleXMigration,
-  floatToHex,
   isOdd,
-  encodeBase64,
-  decodeBase64,
 };
 
 export default ClientTransaction;

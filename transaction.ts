@@ -49,8 +49,8 @@ class ClientTransaction {
 
     try {
       // Initialize indices
-      [this.DEFAULT_ROW_INDEX, this.DEFAULT_KEY_BYTES_INDICES] =
-        await this.getIndices(this.homePageDocument);
+      [this.DEFAULT_ROW_INDEX, this.DEFAULT_KEY_BYTES_INDICES] = await this
+        .getIndices(this.homePageDocument);
 
       // Get key from document
       this.key = this.getKey(this.homePageDocument);
@@ -62,7 +62,7 @@ class ClientTransaction {
       // Generate animation key
       this.animationKey = this.getAnimationKey(
         this.keyBytes,
-        this.homePageDocument
+        this.homePageDocument,
       );
 
       // Mark initialization as complete
@@ -91,7 +91,7 @@ class ClientTransaction {
    * @private
    */
   private async getIndices(
-    homePageDocument?: Document
+    homePageDocument?: Document,
   ): Promise<[number, number[]]> {
     const keyByteIndices: string[] = [];
     const response = homePageDocument || this.homePageDocument;
@@ -102,7 +102,10 @@ class ClientTransaction {
     const onDemandFileMatch = ON_DEMAND_FILE_REGEX.exec(responseStr);
 
     if (onDemandFileMatch) {
-      const onDemandFileUrl = `https://abs.twimg.com/responsive-web/client-web/ondemand.s.${onDemandFileMatch[3]}a.js`;
+      const onDemandFileUrl =
+        `https://abs.twimg.com/responsive-web/client-web/ondemand.s.${
+          onDemandFileMatch[3]
+        }a.js`;
 
       try {
         // Fetch ondemand file
@@ -110,7 +113,7 @@ class ClientTransaction {
 
         if (!onDemandFileResponse.ok) {
           throw new Error(
-            `Failed to fetch ondemand file: ${onDemandFileResponse.statusText}`
+            `Failed to fetch ondemand file: ${onDemandFileResponse.statusText}`,
           );
         }
 
@@ -149,7 +152,7 @@ class ClientTransaction {
 
     // Extract key from meta tag
     const element = response.querySelector(
-      "[name='twitter-site-verification']"
+      "[name='twitter-site-verification']",
     );
     if (element) {
       content = element.getAttribute("content") ?? "";
@@ -193,7 +196,7 @@ class ClientTransaction {
   private get2dArray(
     keyBytes: number[],
     response?: Document,
-    frames?: Element[]
+    frames?: Element[],
   ): number[][] {
     if (!frames) {
       frames = this.getFrames(response);
@@ -239,7 +242,7 @@ class ClientTransaction {
     value: number,
     minVal: number,
     maxVal: number,
-    rounding: boolean
+    rounding: boolean,
   ): number {
     const result = (value * (maxVal - minVal)) / 255 + minVal;
     return rounding ? Math.floor(result) : Math.round(result * 100) / 100;
@@ -285,7 +288,7 @@ class ClientTransaction {
       strArr.push(
         hexValue.startsWith(".")
           ? `0${hexValue}`.toLowerCase()
-          : hexValue || "0"
+          : hexValue || "0",
       );
     }
 
@@ -304,7 +307,9 @@ class ClientTransaction {
   private getAnimationKey(keyBytes: number[], response?: Document): string {
     const totalTime = 4096;
 
-    if (this.DEFAULT_ROW_INDEX == null || this.DEFAULT_KEY_BYTES_INDICES == null) {
+    if (
+      this.DEFAULT_ROW_INDEX == null || this.DEFAULT_KEY_BYTES_INDICES == null
+    ) {
       throw new Error("Indices not initialized");
     }
 
@@ -344,12 +349,12 @@ class ClientTransaction {
     response?: Document,
     key?: string,
     animationKey?: string,
-    timeNow?: number
+    timeNow?: number,
   ): Promise<string> {
     // Check if instance is initialized
     if (!this.isInitialized) {
       throw new Error(
-        "ClientTransaction is not initialized. Call initialize() before using."
+        "ClientTransaction is not initialized. Call initialize() before using.",
       );
     }
 
@@ -365,13 +370,13 @@ class ClientTransaction {
     const keyBytes = key
       ? this.getKeyBytes(key)
       : this.keyBytes || this.getKeyBytes(key);
-    animationKey =
-      animationKey ||
+    animationKey = animationKey ||
       this.animationKey ||
       this.getAnimationKey(keyBytes, response);
 
     // Generate hash data
-    const data = `${method}!${path}!${timeNow}${ClientTransaction.DEFAULT_KEYWORD}${animationKey}`;
+    const data =
+      `${method}!${path}!${timeNow}${ClientTransaction.DEFAULT_KEYWORD}${animationKey}`;
 
     // Calculate SHA-256 hash
     const encoder = new TextEncoder();

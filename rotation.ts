@@ -38,4 +38,4 @@ function convertRotationToMatrix2(degrees: number): number[] {
   return [cos, sin, -sin, cos, 0, 0];
 }
 
-export { convertRotationToMatrix };
+export { convertRotationToMatrix, convertRotationToMatrix2 };

@@ -15,11 +15,11 @@
 function interpolate(
   fromList: number[],
   toList: number[],
-  f: number
+  f: number,
 ): number[] {
   if (fromList.length !== toList.length) {
     throw new Error(
-      `Mismatched interpolation arguments ${fromList}: ${toList}`
+      `Mismatched interpolation arguments ${fromList}: ${toList}`,
     );
   }
   const out: number[] = [];
@@ -39,7 +39,7 @@ function interpolate(
 function interpolateNum(
   fromVal: number | boolean,
   toVal: number | boolean,
-  f: number
+  f: number,
 ): number {
   if (typeof fromVal === "number" && typeof toVal === "number") {
     return fromVal * (1 - f) + toVal * f;
