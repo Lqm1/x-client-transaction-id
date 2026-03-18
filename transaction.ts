@@ -10,9 +10,23 @@ import { convertRotationToMatrix } from "./rotation.ts";
 import { floatToHex, isOdd } from "./utils.ts";
 import { decodeBase64, encodeBase64 } from "@std/encoding";
 
-// Regular expression definitions for extracting necessary data from X's homepage
-const ON_DEMAND_FILE_REGEX = /(['"])ondemand\.s\1:\s*(['"])([\w]*)\2/;
+const ON_DEMAND_CHUNK_NAME = "ondemand.s";
 const INDICES_REGEX = /\(\w\[(\d{1,2})\],\s*16\)/g;
+const ON_DEMAND_FILE_HASH_REGEX =
+  /(\d+):\s*["']ondemand\.s["'][\s\S]*?\}\[e\]\s*\|\|\s*e\)\s*\+\s*["']\.["']\s*\+\s*\{[\s\S]*?\b\1:\s*["']([a-zA-Z0-9_-]+)["']/s;
+
+function resolveOnDemandFileUrlFromRuntime(
+  runtimeSource: string,
+): string | null {
+  const onDemandFileMatch = ON_DEMAND_FILE_HASH_REGEX.exec(runtimeSource);
+  if (!onDemandFileMatch) {
+    return null;
+  }
+
+  return `https://abs.twimg.com/responsive-web/client-web/${ON_DEMAND_CHUNK_NAME}.${
+    onDemandFileMatch[2]
+  }a.js`;
+}
 
 /**
  * Main class responsible for generating client transaction IDs
@@ -96,38 +110,22 @@ class ClientTransaction {
     const keyByteIndices: string[] = [];
     const response = homePageDocument || this.homePageDocument;
 
-    // Extract content from response as string
-    const responseStr = response.documentElement.outerHTML;
+    const onDemandFileUrl = this.getOnDemandFileUrl(response);
+    const onDemandFileResponse = await fetch(onDemandFileUrl);
 
-    const onDemandFileMatch = ON_DEMAND_FILE_REGEX.exec(responseStr);
+    if (!onDemandFileResponse.ok) {
+      throw new Error(
+        `Failed to fetch ondemand file: ${onDemandFileResponse.statusText}`,
+      );
+    }
 
-    if (onDemandFileMatch) {
-      const onDemandFileUrl =
-        `https://abs.twimg.com/responsive-web/client-web/ondemand.s.${
-          onDemandFileMatch[3]
-        }a.js`;
+    const responseText = await onDemandFileResponse.text();
 
-      try {
-        // Fetch ondemand file
-        const onDemandFileResponse = await fetch(onDemandFileUrl);
-
-        if (!onDemandFileResponse.ok) {
-          throw new Error(
-            `Failed to fetch ondemand file: ${onDemandFileResponse.statusText}`,
-          );
-        }
-
-        const responseText = await onDemandFileResponse.text();
-
-        // Extract indices using regex
-        let match: RegExpExecArray | null;
-        INDICES_REGEX.lastIndex = 0; // Reset regex index
-        while ((match = INDICES_REGEX.exec(responseText)) !== null) {
-          keyByteIndices.push(match[1]);
-        }
-      } catch (error) {
-        console.error("Error fetching ondemand file:", error);
-      }
+    // Extract indices using regex
+    let match: RegExpExecArray | null;
+    INDICES_REGEX.lastIndex = 0; // Reset regex index
+    while ((match = INDICES_REGEX.exec(responseText)) !== null) {
+      keyByteIndices.push(match[1]);
     }
 
     if (!keyByteIndices.length) {
@@ -137,6 +135,30 @@ class ClientTransaction {
     // Convert strings to numbers
     const numericIndices = keyByteIndices.map((index) => parseInt(index, 10));
     return [numericIndices[0], numericIndices.slice(1)];
+  }
+
+  /**
+   * Resolves the current ondemand chunk URL from webpack runtime metadata.
+   * @param response Optional document to use instead of stored one
+   * @returns Absolute URL for the ondemand chunk file
+   * @private
+   */
+  private getOnDemandFileUrl(response?: Document): string {
+    const document = response || this.homePageDocument;
+    const runtimeSources = Array.from(document.querySelectorAll("script"))
+      .map((script) => script.textContent || "")
+      .filter((scriptText) => scriptText.includes(ON_DEMAND_CHUNK_NAME));
+
+    runtimeSources.push(document.documentElement.outerHTML);
+
+    for (const runtimeSource of runtimeSources) {
+      const onDemandFileUrl = resolveOnDemandFileUrlFromRuntime(runtimeSource);
+      if (onDemandFileUrl) {
+        return onDemandFileUrl;
+      }
+    }
+
+    throw new Error("Couldn't resolve ondemand chunk URL");
   }
 
   /**
