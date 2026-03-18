@@ -12,15 +12,15 @@
  * @param f Interpolation factor (0.0 to 1.0)
  * @returns Array of interpolated values
  */
+import { InterpolationInputError } from "./errors.ts";
+
 function interpolate(
   fromList: number[],
   toList: number[],
   f: number,
 ): number[] {
   if (fromList.length !== toList.length) {
-    throw new Error(
-      `Mismatched interpolation arguments ${fromList}: ${toList}`,
-    );
+    throw new InterpolationInputError(fromList.length, toList.length);
   }
   const out: number[] = [];
   for (let i = 0; i < fromList.length; i++) {

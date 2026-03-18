@@ -5,6 +5,11 @@
  * number conversions, and other utility operations.
  */
 import { parseHTML } from "linkedom";
+import {
+  XHomePageFetchError,
+  XMigrationFormError,
+  XMigrationRedirectionError,
+} from "./errors.ts";
 
 /**
  * Handles X.com domain migration process and returns the HTML document
@@ -42,7 +47,7 @@ async function handleXMigration(): Promise<Document> {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch X homepage: ${response.statusText}`);
+    throw new XHomePageFetchError(response.status, response.statusText);
   }
 
   const htmlText = await response.text();
@@ -70,8 +75,9 @@ async function handleXMigration(): Promise<Document> {
     const redirectResponse = await fetch(migrationRedirectionUrl[0]);
 
     if (!redirectResponse.ok) {
-      throw new Error(
-        `Failed to follow migration redirection: ${redirectResponse.statusText}`,
+      throw new XMigrationRedirectionError(
+        redirectResponse.status,
+        redirectResponse.statusText,
       );
     }
 
@@ -109,8 +115,9 @@ async function handleXMigration(): Promise<Document> {
     });
 
     if (!formResponse.ok) {
-      throw new Error(
-        `Failed to submit migration form: ${formResponse.statusText}`,
+      throw new XMigrationFormError(
+        formResponse.status,
+        formResponse.statusText,
       );
     }
 

@@ -5,6 +5,15 @@
  * header value required for authenticated API requests to X.
  */
 import Cubic from "./cubic.ts";
+import {
+  AnimationFrameDataError,
+  ClientTransactionNotInitializedError,
+  IndicesNotInitializedError,
+  KeyByteIndicesExtractionError,
+  OnDemandFileFetchError,
+  OnDemandFileUrlResolutionError,
+  SiteVerificationKeyNotFoundError,
+} from "./errors.ts";
 import { interpolate } from "./interpolate.ts";
 import { convertRotationToMatrix } from "./rotation.ts";
 import { floatToHex, isOdd } from "./utils.ts";
@@ -61,30 +70,24 @@ class ClientTransaction {
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-    try {
-      // Initialize indices
-      [this.DEFAULT_ROW_INDEX, this.DEFAULT_KEY_BYTES_INDICES] = await this
-        .getIndices(this.homePageDocument);
+    // Initialize indices
+    [this.DEFAULT_ROW_INDEX, this.DEFAULT_KEY_BYTES_INDICES] = await this
+      .getIndices(this.homePageDocument);
 
-      // Get key from document
-      this.key = this.getKey(this.homePageDocument);
-      if (!this.key) throw new Error("Failed to get key");
+    // Get key from document
+    this.key = this.getKey(this.homePageDocument);
 
-      // Convert key to byte array
-      this.keyBytes = this.getKeyBytes(this.key);
+    // Convert key to byte array
+    this.keyBytes = this.getKeyBytes(this.key);
 
-      // Generate animation key
-      this.animationKey = this.getAnimationKey(
-        this.keyBytes,
-        this.homePageDocument,
-      );
+    // Generate animation key
+    this.animationKey = this.getAnimationKey(
+      this.keyBytes,
+      this.homePageDocument,
+    );
 
-      // Mark initialization as complete
-      this.isInitialized = true;
-    } catch (error) {
-      console.error("Failed to initialize ClientTransaction:", error);
-      throw error;
-    }
+    // Mark initialization as complete
+    this.isInitialized = true;
   }
 
   /**
@@ -114,8 +117,10 @@ class ClientTransaction {
     const onDemandFileResponse = await fetch(onDemandFileUrl);
 
     if (!onDemandFileResponse.ok) {
-      throw new Error(
-        `Failed to fetch ondemand file: ${onDemandFileResponse.statusText}`,
+      throw new OnDemandFileFetchError(
+        onDemandFileUrl,
+        onDemandFileResponse.status,
+        onDemandFileResponse.statusText,
       );
     }
 
@@ -129,7 +134,7 @@ class ClientTransaction {
     }
 
     if (!keyByteIndices.length) {
-      throw new Error("Couldn't get KEY_BYTE indices");
+      throw new KeyByteIndicesExtractionError();
     }
 
     // Convert strings to numbers
@@ -158,7 +163,7 @@ class ClientTransaction {
       }
     }
 
-    throw new Error("Couldn't resolve ondemand chunk URL");
+    throw new OnDemandFileUrlResolutionError();
   }
 
   /**
@@ -181,7 +186,7 @@ class ClientTransaction {
     }
 
     if (!content) {
-      throw new Error("Couldn't get key from the page source");
+      throw new SiteVerificationKeyNotFoundError();
     }
     return content;
   }
@@ -332,7 +337,7 @@ class ClientTransaction {
     if (
       this.DEFAULT_ROW_INDEX == null || this.DEFAULT_KEY_BYTES_INDICES == null
     ) {
-      throw new Error("Indices not initialized");
+      throw new IndicesNotInitializedError();
     }
 
     const rowIndex = keyBytes[this.DEFAULT_ROW_INDEX] % 16;
@@ -345,7 +350,7 @@ class ClientTransaction {
 
     const arr = this.get2dArray(keyBytes, response);
     if (!arr || !arr[rowIndex]) {
-      throw new Error("Invalid frame data");
+      throw new AnimationFrameDataError(rowIndex);
     }
 
     const frameRow = arr[rowIndex];
@@ -375,9 +380,7 @@ class ClientTransaction {
   ): Promise<string> {
     // Check if instance is initialized
     if (!this.isInitialized) {
-      throw new Error(
-        "ClientTransaction is not initialized. Call initialize() before using.",
-      );
+      throw new ClientTransactionNotInitializedError();
     }
 
     timeNow = timeNow || Math.floor((Date.now() - 1682924400 * 1000) / 1000);

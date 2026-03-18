@@ -4,8 +4,112 @@
  * This file contains test cases to verify the functionality of the
  * ClientTransaction class and transaction ID generation.
  */
-import { assertEquals } from "@std/assert";
-import { ClientTransaction, handleXMigration } from "./mod.ts";
+import { assertEquals, assertRejects, assertThrows } from "@std/assert";
+import { parseHTML } from "linkedom";
+import {
+  ClientTransaction,
+  ClientTransactionNotInitializedError,
+  handleXMigration,
+  interpolate,
+  InterpolationInputError,
+  OnDemandFileFetchError,
+  SiteVerificationKeyNotFoundError,
+} from "./mod.ts";
+
+function createDocument(html: string): Document {
+  return parseHTML(html).window.document;
+}
+
+Deno.test("interpolate throws a typed error for mismatched input lengths", () => {
+  assertThrows(
+    () => {
+      interpolate([1], [1, 2], 0.5);
+    },
+    InterpolationInputError,
+    "Interpolation requires arrays of the same length",
+  );
+});
+
+Deno.test("generateTransactionId requires initialization", async () => {
+  const document = createDocument(
+    "<html><head></head><body></body></html>",
+  );
+  const transaction = new ClientTransaction(document);
+
+  await assertRejects(
+    () => transaction.generateTransactionId("GET", "/graphql/test"),
+    ClientTransactionNotInitializedError,
+    "ClientTransaction has not been initialized",
+  );
+});
+
+Deno.test("initialize throws a typed error when the verification key is missing", async () => {
+  const document = createDocument(
+    `<html><body><script>1:"ondemand.s",foo}[e]||e)+"."+{1:"abc123_"}</script></body></html>`,
+  );
+  const originalFetch = globalThis.fetch;
+
+  Object.defineProperty(globalThis, "fetch", {
+    configurable: true,
+    writable: true,
+    value: () =>
+      Promise.resolve(
+        new Response("(a[1], 16)(b[2], 16)", {
+          status: 200,
+        }),
+      ),
+  });
+
+  try {
+    const transaction = new ClientTransaction(document);
+    await assertRejects(
+      () => transaction.initialize(),
+      SiteVerificationKeyNotFoundError,
+      "twitter-site-verification meta tag",
+    );
+  } finally {
+    Object.defineProperty(globalThis, "fetch", {
+      configurable: true,
+      writable: true,
+      value: originalFetch,
+    });
+  }
+});
+
+Deno.test("initialize surfaces ondemand fetch failures as typed errors", async () => {
+  const document = createDocument(
+    `<html><head><meta name="twitter-site-verification" content="AQIDBAUGBwg="/></head><body><script>1:"ondemand.s",foo}[e]||e)+"."+{1:"abc123_"}</script></body></html>`,
+  );
+  const originalFetch = globalThis.fetch;
+
+  Object.defineProperty(globalThis, "fetch", {
+    configurable: true,
+    writable: true,
+    value: () =>
+      Promise.resolve(
+        new Response("missing", {
+          status: 503,
+          statusText: "Service Unavailable",
+        }),
+      ),
+  });
+
+  try {
+    const transaction = new ClientTransaction(document);
+    const error = await assertRejects(
+      () => transaction.initialize(),
+      OnDemandFileFetchError,
+      "Unable to fetch the X ondemand chunk",
+    );
+    assertEquals(error.status, 503);
+  } finally {
+    Object.defineProperty(globalThis, "fetch", {
+      configurable: true,
+      writable: true,
+      value: originalFetch,
+    });
+  }
+});
 
 /**
  * Test to verify the transaction ID generation process
