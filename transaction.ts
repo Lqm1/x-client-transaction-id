@@ -22,7 +22,7 @@ import { decodeBase64, encodeBase64 } from "@std/encoding";
 const ON_DEMAND_CHUNK_NAME = "ondemand.s";
 const INDICES_REGEX = /\(\w\[(\d{1,2})\],\s*16\)/g;
 const ON_DEMAND_FILE_HASH_REGEX =
-  /(\d+):\s*["']ondemand\.s["'][\s\S]*?\}\[e\]\s*\|\|\s*e\)\s*\+\s*["']\.["']\s*\+\s*\{[\s\S]*?\b\1:\s*["']([a-zA-Z0-9_-]+)["']/s;
+  /(\d+):\s*["']ondemand\.s["'][\s\S]*?\}\)\[e\]\s*\|\|\s*e\)\s*\+\s*["']\.["']\s*\+\s*\(\{[\s\S]*?\b\1:\s*["']([a-zA-Z0-9_-]+)["']/s;
 
 function resolveOnDemandFileUrlFromRuntime(
   runtimeSource: string,
