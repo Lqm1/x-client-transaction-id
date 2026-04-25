@@ -2,14 +2,21 @@
  * Custom error types for x-client-transaction-id.
  */
 
+/** Options for constructing error instances with an optional cause and code. */
 type ErrorOptionsWithCode = {
   cause?: unknown;
   code?: string;
 };
 
+/** Base error class for all client transaction related errors. */
 class ClientTransactionError extends Error {
   readonly code: string;
 
+  /**
+   * Creates a new ClientTransactionError.
+   * @param message Error message
+   * @param options Optional cause and error code
+   */
   constructor(message: string, options: ErrorOptionsWithCode = {}) {
     super(message, options.cause ? { cause: options.cause } : undefined);
     this.name = new.target.name;
@@ -17,7 +24,13 @@ class ClientTransactionError extends Error {
   }
 }
 
+/** Error thrown when ClientTransaction initialization fails. */
 class ClientTransactionInitializationError extends ClientTransactionError {
+  /**
+   * Creates a new ClientTransactionInitializationError.
+   * @param message Error message
+   * @param options Optional cause and error code
+   */
   constructor(message: string, options: ErrorOptionsWithCode = {}) {
     super(message, {
       code: options.code ?? "CLIENT_TRANSACTION_INITIALIZATION_ERROR",
@@ -26,6 +39,7 @@ class ClientTransactionInitializationError extends ClientTransactionError {
   }
 }
 
+/** Error thrown when the ondemand file URL cannot be resolved from the homepage runtime. */
 class OnDemandFileUrlResolutionError
   extends ClientTransactionInitializationError {
   constructor() {
@@ -36,11 +50,18 @@ class OnDemandFileUrlResolutionError
   }
 }
 
+/** Error thrown when fetching the ondemand file fails. */
 class OnDemandFileFetchError extends ClientTransactionInitializationError {
   readonly url: string;
   readonly status: number;
   readonly statusText: string;
 
+  /**
+   * Creates a new OnDemandFileFetchError.
+   * @param url URL that was fetched
+   * @param status HTTP status code
+   * @param statusText HTTP status text
+   */
   constructor(url: string, status: number, statusText: string) {
     super(
       `Unable to fetch the X ondemand chunk from "${url}": ${status} ${statusText}.`,
@@ -52,6 +73,7 @@ class OnDemandFileFetchError extends ClientTransactionInitializationError {
   }
 }
 
+/** Error thrown when key byte indices cannot be extracted from the ondemand chunk. */
 class KeyByteIndicesExtractionError
   extends ClientTransactionInitializationError {
   constructor() {
@@ -62,6 +84,7 @@ class KeyByteIndicesExtractionError
   }
 }
 
+/** Error thrown when the twitter-site-verification meta tag is not found. */
 class SiteVerificationKeyNotFoundError
   extends ClientTransactionInitializationError {
   constructor() {
@@ -72,6 +95,7 @@ class SiteVerificationKeyNotFoundError
   }
 }
 
+/** Error thrown when indices are accessed before initialization. */
 class IndicesNotInitializedError extends ClientTransactionError {
   constructor() {
     super(
@@ -81,9 +105,14 @@ class IndicesNotInitializedError extends ClientTransactionError {
   }
 }
 
+/** Error thrown when animation frame data cannot be built for a given row. */
 class AnimationFrameDataError extends ClientTransactionInitializationError {
   readonly rowIndex: number;
 
+  /**
+   * Creates a new AnimationFrameDataError.
+   * @param rowIndex Row index that failed
+   */
   constructor(rowIndex: number) {
     super(
       `Unable to build animation data for row ${rowIndex}. The homepage animation markup may have changed.`,
@@ -93,6 +122,7 @@ class AnimationFrameDataError extends ClientTransactionInitializationError {
   }
 }
 
+/** Error thrown when ClientTransaction is used before initialization. */
 class ClientTransactionNotInitializedError extends ClientTransactionError {
   constructor() {
     super(
@@ -102,7 +132,13 @@ class ClientTransactionNotInitializedError extends ClientTransactionError {
   }
 }
 
+/** Base error class for X domain migration related errors. */
 class HandleXMigrationError extends ClientTransactionError {
+  /**
+   * Creates a new HandleXMigrationError.
+   * @param message Error message
+   * @param options Optional cause and error code
+   */
   constructor(message: string, options: ErrorOptionsWithCode = {}) {
     super(message, {
       code: options.code ?? "HANDLE_X_MIGRATION_ERROR",
@@ -111,10 +147,16 @@ class HandleXMigrationError extends ClientTransactionError {
   }
 }
 
+/** Error thrown when fetching the X homepage fails. */
 class XHomePageFetchError extends HandleXMigrationError {
   readonly status: number;
   readonly statusText: string;
 
+  /**
+   * Creates a new XHomePageFetchError.
+   * @param status HTTP status code
+   * @param statusText HTTP status text
+   */
   constructor(status: number, statusText: string) {
     super(
       `Unable to fetch the X homepage: ${status} ${statusText}.`,
@@ -125,10 +167,16 @@ class XHomePageFetchError extends HandleXMigrationError {
   }
 }
 
+/** Error thrown when following the X migration redirect fails. */
 class XMigrationRedirectionError extends HandleXMigrationError {
   readonly status: number;
   readonly statusText: string;
 
+  /**
+   * Creates a new XMigrationRedirectionError.
+   * @param status HTTP status code
+   * @param statusText HTTP status text
+   */
   constructor(status: number, statusText: string) {
     super(
       `Unable to follow the X migration redirect: ${status} ${statusText}.`,
@@ -139,10 +187,16 @@ class XMigrationRedirectionError extends HandleXMigrationError {
   }
 }
 
+/** Error thrown when submitting the X migration form fails. */
 class XMigrationFormError extends HandleXMigrationError {
   readonly status: number;
   readonly statusText: string;
 
+  /**
+   * Creates a new XMigrationFormError.
+   * @param status HTTP status code
+   * @param statusText HTTP status text
+   */
   constructor(status: number, statusText: string) {
     super(
       `Unable to submit the X migration form: ${status} ${statusText}.`,
@@ -153,10 +207,16 @@ class XMigrationFormError extends HandleXMigrationError {
   }
 }
 
+/** Error thrown when interpolation inputs have mismatched lengths. */
 class InterpolationInputError extends ClientTransactionError {
   readonly fromLength: number;
   readonly toLength: number;
 
+  /**
+   * Creates a new InterpolationInputError.
+   * @param fromLength Length of the from array
+   * @param toLength Length of the to array
+   */
   constructor(fromLength: number, toLength: number) {
     super(
       `Interpolation requires arrays of the same length, but received ${fromLength} and ${toLength}.`,
