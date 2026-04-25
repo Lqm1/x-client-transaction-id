@@ -45,7 +45,7 @@ Deno.test("generateTransactionId requires initialization", async () => {
 
 Deno.test("initialize throws a typed error when the verification key is missing", async () => {
   const document = createDocument(
-    `<html><body><script>1:"ondemand.s",foo}[e]||e)+"."+{1:"abc123_"}</script></body></html>`,
+    `<html><body><script>1:"ondemand.s",foo})[e]||e)+"."+({1:"abc123_"}</script></body></html>`,
   );
   const originalFetch = globalThis.fetch;
 
@@ -78,7 +78,7 @@ Deno.test("initialize throws a typed error when the verification key is missing"
 
 Deno.test("initialize surfaces ondemand fetch failures as typed errors", async () => {
   const document = createDocument(
-    `<html><head><meta name="twitter-site-verification" content="AQIDBAUGBwg="/></head><body><script>1:"ondemand.s",foo}[e]||e)+"."+{1:"abc123_"}</script></body></html>`,
+    `<html><head><meta name="twitter-site-verification" content="AQIDBAUGBwg="/></head><body><script>1:"ondemand.s",foo})[e]||e)+"."+({1:"abc123_"}</script></body></html>`,
   );
   const originalFetch = globalThis.fetch;
 
