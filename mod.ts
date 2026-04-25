@@ -40,7 +40,9 @@ export {
   ClientTransactionNotInitializedError,
   convertRotationToMatrix,
   Cubic,
+  /** Decodes a base64-encoded string into a Uint8Array. */
   decodeBase64,
+  /** Encodes data to a base64-encoded string. */
   encodeBase64,
   floatToHex,
   handleXMigration,

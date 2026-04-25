@@ -261,7 +261,7 @@ class ClientTransaction {
    * @param value Input value (0-255)
    * @param minVal Minimum output value
    * @param maxVal Maximum output value
-   * @param rounding Whether to use floor (true) or round (false)
+   * @param rounding When true, uses Math.floor; when false, rounds to 2 decimal places
    * @returns Calculated value
    * @private
    */
@@ -368,7 +368,7 @@ class ClientTransaction {
    * @param key Optional key to use
    * @param animationKey Optional animation key to use
    * @param timeNow Optional timestamp (defaults to current time)
-   * @returns Base64 encoded transaction ID
+   * @returns Base64 encoded transaction ID with padding removed
    */
   async generateTransactionId(
     method: string,
