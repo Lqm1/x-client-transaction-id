@@ -1,27 +1,25 @@
 /**
  * Utility functions for X client transaction ID generation
  *
- * This module provides helper functions for handling X domain migration,
+ * This module provides helper functions for fetching X's web app shell,
  * number conversions, and other utility operations.
  */
 import { parseHTML } from "linkedom";
-import {
-  XHomePageFetchError,
-  XMigrationFormError,
-  XMigrationRedirectionError,
-} from "./errors.ts";
+import { XHomePageFetchError } from "./errors.ts";
 
 const X_HOME_URL = "https://x.com/home";
 
 /**
- * Handles X.com domain migration process and returns the HTML document
+ * Fetches X's responsive web app shell and returns the HTML document.
  *
- * This function navigates through X's migration redirects and forms
- * to obtain the final HTML document needed for transaction ID generation.
+ * The `/home` route serves the full client bundle whose inline runtime
+ * exposes the ondemand chunk map and guest token required for transaction
+ * ID generation, even when the request is unauthenticated.
  *
  * @returns Promise resolving to the Document object from X's responsive web app
+ * @throws {XHomePageFetchError} If the request to X's home route fails.
  */
-async function handleXMigration(): Promise<Document> {
+async function fetchXDocument(): Promise<Document> {
   // Set headers to mimic a browser request
   const headers = {
     accept:
@@ -56,89 +54,29 @@ async function handleXMigration(): Promise<Document> {
   const htmlText = await response.text();
 
   // Parse HTML using linkedom
-  let dom = parseHTML(htmlText);
-  let document = dom.window.document;
+  const dom = parseHTML(htmlText);
+  const document = dom.window.document;
 
-  // Check for migration redirection links
-  const migrationRedirectionRegex = new RegExp(
-    "(http(?:s)?://(?:www\\.)?(twitter|x){1}\\.com(/x)?/migrate([/?])?tok=[a-zA-Z0-9%\\-_]+)+",
-    "i",
-  );
-
-  const metaRefresh = document.querySelector("meta[http-equiv='refresh']");
-  const metaContent = metaRefresh
-    ? metaRefresh.getAttribute("content") || ""
-    : "";
-
-  const migrationRedirectionUrl = migrationRedirectionRegex.exec(metaContent) ||
-    migrationRedirectionRegex.exec(htmlText);
-
-  if (migrationRedirectionUrl) {
-    // Follow redirection URL
-    const redirectResponse = await fetch(migrationRedirectionUrl[0]);
-
-    if (!redirectResponse.ok) {
-      throw new XMigrationRedirectionError(
-        redirectResponse.status,
-        redirectResponse.statusText,
-      );
-    }
-
-    const redirectHtml = await redirectResponse.text();
-    dom = parseHTML(redirectHtml);
-    document = dom.window.document;
-  }
-
-  // Handle migration form if present
-  const migrationForm = document.querySelector("form[name='f']") ||
-    document.querySelector("form[action='https://x.com/x/migrate']");
-
-  if (migrationForm) {
-    const url = migrationForm.getAttribute("action") ||
-      "https://x.com/x/migrate";
-    const method = migrationForm.getAttribute("method") || "POST";
-
-    // Collect form input fields
-    const requestPayload = new FormData();
-
-    const inputFields = migrationForm.querySelectorAll("input");
-    for (const element of Array.from(inputFields)) {
-      const name = element.getAttribute("name");
-      const value = element.getAttribute("value");
-      if (name && value) {
-        requestPayload.append(name, value);
-      }
-    }
-
-    // Submit form using POST request
-    const formResponse = await fetch(url, {
-      method: method,
-      body: requestPayload,
-      headers,
-    });
-
-    if (!formResponse.ok) {
-      throw new XMigrationFormError(
-        formResponse.status,
-        formResponse.statusText,
-      );
-    }
-
-    const formHtml = await formResponse.text();
-    dom = parseHTML(formHtml);
-    document = dom.window.document;
-  }
-
-  // Return final DOM document
+  // Return the DOM document
   return document;
 }
 
 /**
- * Activates a guest token via the X guest activate API.
+ * Fetches X's responsive web app shell and returns the HTML document.
  *
- * X no longer embeds the guest token in the homepage HTML, so a fresh
- * guest token must be obtained by calling the guest activate endpoint with
- * the public bearer token.
+ * @deprecated X no longer performs a domain migration step. Use {@link fetchXDocument}
+ *             instead. This function is kept only for backward compatibility and
+ *             simply delegates to {@link fetchXDocument}.
+ *
+ * @returns Promise resolving to the Document object from X's responsive web app
+ * @throws {XHomePageFetchError} If the request to X's home route fails.
+ */
+function handleXMigration(): Promise<Document> {
+  return fetchXDocument();
+}
+
+/**
+ * Activates a guest token via the X guest activate API.
  *
  * @returns Promise resolving to the guest token string, or null on failure.
  */
@@ -226,4 +164,10 @@ function isOdd(num: number): number {
   return 0.0;
 }
 
-export { activateGuestToken, floatToHex, handleXMigration, isOdd };
+export {
+  activateGuestToken,
+  fetchXDocument,
+  floatToHex,
+  handleXMigration,
+  isOdd,
+};

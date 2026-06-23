@@ -29,7 +29,13 @@ import {
 } from "./errors.ts";
 import { interpolate, interpolateNum } from "./interpolate.ts";
 import { convertRotationToMatrix } from "./rotation.ts";
-import { activateGuestToken, floatToHex, handleXMigration, isOdd } from "./utils.ts";
+import {
+  activateGuestToken,
+  fetchXDocument,
+  floatToHex,
+  handleXMigration,
+  isOdd,
+} from "./utils.ts";
 import { decodeBase64, encodeBase64 } from "@std/encoding";
 
 export {
@@ -45,6 +51,7 @@ export {
   decodeBase64,
   /** Encodes data to a base64-encoded string. */
   encodeBase64,
+  fetchXDocument,
   floatToHex,
   handleXMigration,
   HandleXMigrationError,

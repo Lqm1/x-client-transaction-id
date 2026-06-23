@@ -132,7 +132,12 @@ class ClientTransactionNotInitializedError extends ClientTransactionError {
   }
 }
 
-/** Base error class for X domain migration related errors. */
+/**
+ * Base error class for errors raised while fetching X's web app shell.
+ *
+ * Historically named after X's now-removed domain migration flow; the class
+ * is still used as the base for {@link XHomePageFetchError}.
+ */
 class HandleXMigrationError extends ClientTransactionError {
   /**
    * Creates a new HandleXMigrationError.
@@ -167,7 +172,13 @@ class XHomePageFetchError extends HandleXMigrationError {
   }
 }
 
-/** Error thrown when following the X migration redirect fails. */
+/**
+ * Error thrown when following the X migration redirect fails.
+ *
+ * @deprecated X no longer performs a domain migration step. This error is
+ *             retained only for backward compatibility and is no longer
+ *             thrown by the library.
+ */
 class XMigrationRedirectionError extends HandleXMigrationError {
   readonly status: number;
   readonly statusText: string;
@@ -187,7 +198,13 @@ class XMigrationRedirectionError extends HandleXMigrationError {
   }
 }
 
-/** Error thrown when submitting the X migration form fails. */
+/**
+ * Error thrown when submitting the X migration form fails.
+ *
+ * @deprecated X no longer performs a domain migration step. This error is
+ *             retained only for backward compatibility and is no longer
+ *             thrown by the library.
+ */
 class XMigrationFormError extends HandleXMigrationError {
   readonly status: number;
   readonly statusText: string;
