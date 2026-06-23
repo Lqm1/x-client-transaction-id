@@ -134,6 +134,38 @@ async function handleXMigration(): Promise<Document> {
 }
 
 /**
+ * Activates a guest token via the X guest activate API.
+ *
+ * X no longer embeds the guest token in the homepage HTML, so a fresh
+ * guest token must be obtained by calling the guest activate endpoint with
+ * the public bearer token.
+ *
+ * @returns Promise resolving to the guest token string, or null on failure.
+ */
+async function activateGuestToken(): Promise<string | null> {
+  try {
+    const response = await fetch(
+      "https://api.x.com/1.1/guest/activate.json",
+      {
+        method: "POST",
+        headers: {
+          authorization:
+            "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",
+          "content-type": "application/json",
+        },
+      },
+    );
+    if (!response.ok) {
+      return null;
+    }
+    const data = await response.json();
+    return data?.guest_token ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Converts a floating point number to hexadecimal string representation
  *
  * @param x Floating point number to convert
@@ -194,4 +226,4 @@ function isOdd(num: number): number {
   return 0.0;
 }
 
-export { floatToHex, handleXMigration, isOdd };
+export { activateGuestToken, floatToHex, handleXMigration, isOdd };
