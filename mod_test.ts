@@ -7,6 +7,7 @@
 import { assertEquals, assertRejects, assertThrows } from "@std/assert";
 import { parseHTML } from "linkedom";
 import {
+  activateGuestToken,
   ClientTransaction,
   ClientTransactionNotInitializedError,
   handleXMigration,
@@ -115,7 +116,7 @@ Deno.test("initialize surfaces ondemand fetch failures as typed errors", async (
  * Test to verify the transaction ID generation process
  *
  * This test performs the following steps:
- * 1. Fetches the X homepage and extracts guest token for each request
+ * 1. Fetches the X homepage and activates a guest token via the guest API for each request
  * 2. Creates a new ClientTransaction instance for each request
  * 3. Generates a transaction ID for a specific API endpoint
  * 4. Makes 25 API requests and verifies all of them are successful (100% success rate)
@@ -172,12 +173,14 @@ Deno.test(
 
       // Create new document and ClientTransaction instance for each request
       const document = await handleXMigration();
-      const guestToken =
-        document.documentElement.outerHTML.match(/gt=([0-9]+);/)?.[1] || null;
+
+      // X no longer embeds the guest token in the homepage HTML.
+      // Fetch a fresh guest token via the guest activate API instead.
+      const guestToken = await activateGuestToken();
 
       if (!guestToken) {
         console.error(
-          `Request ${i + 1}: Failed to extract guest token from the document`,
+          `Request ${i + 1}: Failed to activate guest token via the API`,
         );
         continue;
       }
