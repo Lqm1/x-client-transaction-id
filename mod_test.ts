@@ -20,6 +20,46 @@ function createDocument(html: string): Document {
   return parseHTML(html).window.document;
 }
 
+Deno.test("handleXMigration fetches the responsive web app document", async () => {
+  const originalFetch = globalThis.fetch;
+  const requestedUrls: string[] = [];
+
+  Object.defineProperty(globalThis, "fetch", {
+    configurable: true,
+    writable: true,
+    value: (input: RequestInfo | URL) => {
+      let url: string;
+      if (typeof input === "string") {
+        url = input;
+      } else if (input instanceof URL) {
+        url = input.toString();
+      } else {
+        url = input.url;
+      }
+      requestedUrls.push(url);
+
+      return Promise.resolve(
+        new Response("<html><body><main>ok</main></body></html>", {
+          status: 200,
+        }),
+      );
+    },
+  });
+
+  try {
+    const document = await handleXMigration();
+
+    assertEquals(requestedUrls[0], "https://x.com/home");
+    assertEquals(document.querySelector("main")?.textContent, "ok");
+  } finally {
+    Object.defineProperty(globalThis, "fetch", {
+      configurable: true,
+      writable: true,
+      value: originalFetch,
+    });
+  }
+});
+
 Deno.test("interpolate throws a typed error for mismatched input lengths", () => {
   assertThrows(
     () => {
@@ -115,7 +155,7 @@ Deno.test("initialize surfaces ondemand fetch failures as typed errors", async (
  * Test to verify the transaction ID generation process
  *
  * This test performs the following steps:
- * 1. Fetches the X homepage and extracts guest token for each request
+ * 1. Fetches the X responsive web app and extracts guest token for each request
  * 2. Creates a new ClientTransaction instance for each request
  * 3. Generates a transaction ID for a specific API endpoint
  * 4. Makes 25 API requests and verifies all of them are successful (100% success rate)
@@ -168,7 +208,7 @@ Deno.test(
     console.log(`Running ${totalRequests} API requests...`);
 
     for (let i = 0; i < totalRequests; i++) {
-      console.log(`Request ${i + 1}/${totalRequests}: Fetching X homepage...`);
+      console.log(`Request ${i + 1}/${totalRequests}: Fetching X document...`);
 
       // Create new document and ClientTransaction instance for each request
       const document = await handleXMigration();

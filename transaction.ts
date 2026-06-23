@@ -55,7 +55,7 @@ class ClientTransaction {
 
   /**
    * Creates a new ClientTransaction instance
-   * @param homePageDocument DOM Document object from X's homepage
+   * @param homePageDocument DOM Document object from X's responsive web app
    */
   constructor(homePageDocument: Document) {
     this.homePageDocument = homePageDocument;
@@ -92,7 +92,7 @@ class ClientTransaction {
 
   /**
    * Static factory method that creates and initializes a ClientTransaction instance
-   * @param homePageDocument DOM Document object from X's homepage
+   * @param homePageDocument DOM Document object from X's responsive web app
    * @returns Initialized ClientTransaction instance
    */
   static async create(homePageDocument: Document): Promise<ClientTransaction> {
@@ -102,7 +102,7 @@ class ClientTransaction {
   }
 
   /**
-   * Extracts key byte indices from homepage document
+   * Extracts key byte indices from the X responsive web app document
    * @param homePageDocument Optional document to use instead of stored one
    * @returns Tuple of [rowIndex, keyByteIndices]
    * @private
