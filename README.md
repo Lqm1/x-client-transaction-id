@@ -66,7 +66,7 @@ This library has been tested and confirmed to work with the following runtimes:
 ```ts
 import { ClientTransaction, handleXMigration } from "x-client-transaction-id";
 
-// Get the X homepage HTML document (using utility function)
+// Get the X responsive web app document (using utility function)
 const document = await handleXMigration();
 
 // Create and initialize ClientTransaction instance
@@ -100,8 +100,8 @@ const apiResponse = await fetch(
 ```ts
 import { ClientTransaction } from "x-client-transaction-id";
 
-// Get Twitter homepage HTML document
-const response = await fetch("https://twitter.com/");
+// Get the X responsive web app document
+const response = await fetch("https://x.com/home");
 const html = await response.text();
 const parser = new DOMParser();
 const document = parser.parseFromString(html, "text/html");
@@ -121,8 +121,8 @@ const transactionId = await transaction.generateTransactionId(
 
 - `ClientTransaction`: Main class for generating transaction IDs for X API
   requests
-- `handleXMigration`: Utility function to retrieve the DOM document from X
-  (Twitter) homepage
+- `handleXMigration`: Utility function to retrieve the DOM document from the X
+  responsive web app
 - `Cubic`: Class for cubic interpolation calculations used in animation key
   generation
 - `interpolate`/`interpolateNum`: Utility functions for value interpolation
@@ -141,7 +141,7 @@ Main class for handling X client transactions.
 constructor(homePageDocument: Document)
 ```
 
-- `homePageDocument`: The DOM document from the Twitter homepage
+- `homePageDocument`: The DOM document from the X responsive web app
 
 #### Methods
 
@@ -158,7 +158,7 @@ constructor(homePageDocument: Document)
 async function handleXMigration(): Promise<Document>;
 ```
 
-Retrieves the X (Twitter) homepage and returns a DOM-parsed Document object.
+Retrieves the X responsive web app and returns a DOM-parsed Document object.
 This makes it easy to get the document needed for ClientTransaction
 initialization.
 

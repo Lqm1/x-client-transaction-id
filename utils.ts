@@ -11,13 +11,15 @@ import {
   XMigrationRedirectionError,
 } from "./errors.ts";
 
+const X_HOME_URL = "https://x.com/home";
+
 /**
  * Handles X.com domain migration process and returns the HTML document
  *
  * This function navigates through X's migration redirects and forms
  * to obtain the final HTML document needed for transaction ID generation.
  *
- * @returns Promise resolving to the Document object from X's homepage
+ * @returns Promise resolving to the Document object from X's responsive web app
  */
 async function handleXMigration(): Promise<Document> {
   // Set headers to mimic a browser request
@@ -41,8 +43,9 @@ async function handleXMigration(): Promise<Document> {
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
   };
 
-  // Fetch X.com homepage
-  const response = await fetch("https://x.com", {
+  // Fetch the responsive web app shell. The bare x.com homepage can serve a
+  // separate logged-out app that no longer includes the ondemand chunk map.
+  const response = await fetch(X_HOME_URL, {
     headers,
   });
 

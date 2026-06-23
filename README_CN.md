@@ -65,7 +65,7 @@ import { ClientTransaction } from "jsr:@lami/x-client-transaction-id@0.1.0";
 ```ts
 import { ClientTransaction, handleXMigration } from "x-client-transaction-id";
 
-// 获取X主页HTML文档（使用实用函数）
+// 获取 X 响应式 Web 应用的 HTML 文档（使用实用函数）
 const document = await handleXMigration();
 
 // 创建并初始化ClientTransaction实例
@@ -99,8 +99,8 @@ const apiResponse = await fetch(
 ```ts
 import { ClientTransaction } from "x-client-transaction-id";
 
-// 获取Twitter主页HTML文档
-const response = await fetch("https://twitter.com/");
+// 获取 X 响应式 Web 应用的 HTML 文档
+const response = await fetch("https://x.com/home");
 const html = await response.text();
 const parser = new DOMParser();
 const document = parser.parseFromString(html, "text/html");
@@ -119,7 +119,7 @@ const transactionId = await transaction.generateTransactionId(
 ## 主要功能
 
 - `ClientTransaction`：用于生成X API请求交易ID的主类
-- `handleXMigration`：从X（Twitter）主页检索DOM文档的实用函数
+- `handleXMigration`：从 X 响应式 Web 应用检索 DOM 文档的实用函数
 - `Cubic`：用于动画键生成的三次插值计算类
 - `interpolate`/`interpolateNum`：值插值的实用函数
 - `convertRotationToMatrix`：将旋转值转换为矩阵的函数
@@ -137,7 +137,7 @@ const transactionId = await transaction.generateTransactionId(
 constructor(homePageDocument: Document)
 ```
 
-- `homePageDocument`：Twitter主页的DOM文档
+- `homePageDocument`：X 响应式 Web 应用的 DOM 文档
 
 #### 方法
 
@@ -151,7 +151,7 @@ constructor(homePageDocument: Document)
 async function handleXMigration(): Promise<Document>;
 ```
 
-检索X（Twitter）主页并返回DOM解析的Document对象。这使得获取ClientTransaction初始化所需的文档变得容易。
+检索 X 响应式 Web 应用并返回 DOM 解析的 Document 对象。这使得获取 ClientTransaction 初始化所需的文档变得容易。
 
 ## 免责声明
 
