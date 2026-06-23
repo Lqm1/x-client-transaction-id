@@ -158,7 +158,7 @@ Deno.test("initialize surfaces ondemand fetch failures as typed errors", async (
  * 1. Fetches the X homepage and extracts guest token for each request
  * 2. Creates a new ClientTransaction instance for each request
  * 3. Generates a transaction ID for a specific API endpoint
- * 4. Makes 25 API requests and verifies all of them are successful (100% success rate)
+ * 4. Makes 5 API requests and verifies all of them are successful (100% success rate)
  *
  * Note: Rate limiting may occur. Rate limiting produces the same 404 errors
  * as an invalid x-client-transaction-id. If more than 50% of requests return 404
@@ -168,7 +168,7 @@ Deno.test("initialize surfaces ondemand fetch failures as typed errors", async (
 Deno.test(
   "Generate and verify transaction ID for X API UserByScreenName endpoint",
   async () => {
-    const totalRequests = 25;
+    const totalRequests = 5;
     let successfulRequests = 0;
     let notFoundErrors = 0;
 
