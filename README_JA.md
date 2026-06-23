@@ -63,10 +63,10 @@ import { ClientTransaction } from "jsr:@lami/x-client-transaction-id@0.1.0";
 ### 基本的な使用例
 
 ```ts
-import { ClientTransaction, handleXMigration } from "x-client-transaction-id";
+import { ClientTransaction, fetchXDocument } from "x-client-transaction-id";
 
 // XのレスポンシブWebアプリのHTMLドキュメントを取得（ユーティリティ関数を使用）
-const document = await handleXMigration();
+const document = await fetchXDocument();
 
 // ClientTransactionのインスタンスを作成と初期化
 const transaction = await ClientTransaction.create(document);
@@ -120,8 +120,10 @@ const transactionId = await transaction.generateTransactionId(
 
 - `ClientTransaction`: X
   APIリクエスト用のトランザクションIDを生成するメインクラス
-- `handleXMigration`:
+- `fetchXDocument`:
   XのレスポンシブWebアプリのDOMドキュメントを取得するユーティリティ関数
+- `handleXMigration` *（非推奨）*:
+  `fetchXDocument` のエイリアスで、後方互換性のために残されています
 - `Cubic`: アニメーションキー生成のための3次補間計算を行うクラス
 - `interpolate`/`interpolateNum`: 値の補間を行うユーティリティ関数
 - `convertRotationToMatrix`: 回転値を行列に変換する関数
@@ -151,13 +153,16 @@ constructor(homePageDocument: Document)
 - `async generateTransactionId(method: string, path: string, ...): Promise<string>`:
   指定されたHTTPメソッドとAPIパスに対するトランザクションIDを生成
 
-### `handleXMigration`
+### `fetchXDocument`
 
 ```ts
-async function handleXMigration(): Promise<Document>;
+async function fetchXDocument(): Promise<Document>;
 ```
 
 XのレスポンシブWebアプリを取得し、DOMパースしたDocumentオブジェクトを返します。ClientTransactionの初期化に必要なドキュメントを簡単に取得できます。
+
+> [!NOTE]
+> `handleXMigration` は `fetchXDocument` の非推奨エイリアスであり、後方互換性のためだけに残されています。新規コードでは `fetchXDocument` を使用してください。
 
 ## 免責事項
 

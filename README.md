@@ -64,10 +64,10 @@ This library has been tested and confirmed to work with the following runtimes:
 ### Basic Example
 
 ```ts
-import { ClientTransaction, handleXMigration } from "x-client-transaction-id";
+import { ClientTransaction, fetchXDocument } from "x-client-transaction-id";
 
 // Get the X responsive web app document (using utility function)
-const document = await handleXMigration();
+const document = await fetchXDocument();
 
 // Create and initialize ClientTransaction instance
 const transaction = await ClientTransaction.create(document);
@@ -121,8 +121,10 @@ const transactionId = await transaction.generateTransactionId(
 
 - `ClientTransaction`: Main class for generating transaction IDs for X API
   requests
-- `handleXMigration`: Utility function to retrieve the DOM document from the X
+- `fetchXDocument`: Utility function to retrieve the DOM document from the X
   responsive web app
+- `handleXMigration` *(deprecated)*: Alias for `fetchXDocument`, retained for
+  backward compatibility
 - `Cubic`: Class for cubic interpolation calculations used in animation key
   generation
 - `interpolate`/`interpolateNum`: Utility functions for value interpolation
@@ -152,15 +154,19 @@ constructor(homePageDocument: Document)
 - `async generateTransactionId(method: string, path: string, ...): Promise<string>`:
   Generate a transaction ID for the specified HTTP method and API path
 
-### `handleXMigration`
+### `fetchXDocument`
 
 ```ts
-async function handleXMigration(): Promise<Document>;
+async function fetchXDocument(): Promise<Document>;
 ```
 
 Retrieves the X responsive web app and returns a DOM-parsed Document object.
 This makes it easy to get the document needed for ClientTransaction
 initialization.
+
+> [!NOTE]
+> `handleXMigration` is a deprecated alias for `fetchXDocument` and is retained
+> only for backward compatibility. Prefer `fetchXDocument` in new code.
 
 ## Disclaimer
 

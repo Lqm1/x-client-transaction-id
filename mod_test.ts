@@ -7,10 +7,9 @@
 import { assertEquals, assertRejects, assertThrows } from "@std/assert";
 import { parseHTML } from "linkedom";
 import {
-  activateGuestToken,
   ClientTransaction,
   ClientTransactionNotInitializedError,
-  handleXMigration,
+  fetchXDocument,
   interpolate,
   InterpolationInputError,
   OnDemandFileFetchError,
@@ -21,7 +20,7 @@ function createDocument(html: string): Document {
   return parseHTML(html).window.document;
 }
 
-Deno.test("handleXMigration fetches the responsive web app document", async () => {
+Deno.test("fetchXDocument fetches the responsive web app document", async () => {
   const originalFetch = globalThis.fetch;
   const requestedUrls: string[] = [];
 
@@ -48,7 +47,7 @@ Deno.test("handleXMigration fetches the responsive web app document", async () =
   });
 
   try {
-    const document = await handleXMigration();
+    const document = await fetchXDocument();
 
     assertEquals(requestedUrls[0], "https://x.com/home");
     assertEquals(document.querySelector("main")?.textContent, "ok");
@@ -156,7 +155,7 @@ Deno.test("initialize surfaces ondemand fetch failures as typed errors", async (
  * Test to verify the transaction ID generation process
  *
  * This test performs the following steps:
- * 1. Fetches the X responsive web app and activates a guest token via the guest API for each request
+ * 1. Fetches the X homepage and extracts guest token for each request
  * 2. Creates a new ClientTransaction instance for each request
  * 3. Generates a transaction ID for a specific API endpoint
  * 4. Makes 25 API requests and verifies all of them are successful (100% success rate)
@@ -212,15 +211,15 @@ Deno.test(
       console.log(`Request ${i + 1}/${totalRequests}: Fetching X document...`);
 
       // Create new document and ClientTransaction instance for each request
-      const document = await handleXMigration();
+      const document = await fetchXDocument();
 
-      // X no longer embeds the guest token in the homepage HTML.
-      // Fetch a fresh guest token via the guest activate API instead.
-      const guestToken = await activateGuestToken();
+      // Extract the guest token embedded in the document HTML
+      const guestToken =
+        document.documentElement.outerHTML.match(/gt=([0-9]+);/)?.[1] || null;
 
       if (!guestToken) {
         console.error(
-          `Request ${i + 1}: Failed to activate guest token via the API`,
+          `Request ${i + 1}: Failed to extract guest token from the document`,
         );
         continue;
       }

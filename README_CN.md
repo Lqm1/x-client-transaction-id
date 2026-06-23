@@ -63,10 +63,10 @@ import { ClientTransaction } from "jsr:@lami/x-client-transaction-id@0.1.0";
 ### 基本示例
 
 ```ts
-import { ClientTransaction, handleXMigration } from "x-client-transaction-id";
+import { ClientTransaction, fetchXDocument } from "x-client-transaction-id";
 
 // 获取 X 响应式 Web 应用的 HTML 文档（使用实用函数）
-const document = await handleXMigration();
+const document = await fetchXDocument();
 
 // 创建并初始化ClientTransaction实例
 const transaction = await ClientTransaction.create(document);
@@ -119,7 +119,8 @@ const transactionId = await transaction.generateTransactionId(
 ## 主要功能
 
 - `ClientTransaction`：用于生成X API请求交易ID的主类
-- `handleXMigration`：从 X 响应式 Web 应用检索 DOM 文档的实用函数
+- `fetchXDocument`：从 X 响应式 Web 应用检索 DOM 文档的实用函数
+- `handleXMigration` *（已弃用）*：`fetchXDocument` 的别名，仅为向后兼容而保留
 - `Cubic`：用于动画键生成的三次插值计算类
 - `interpolate`/`interpolateNum`：值插值的实用函数
 - `convertRotationToMatrix`：将旋转值转换为矩阵的函数
@@ -145,13 +146,16 @@ constructor(homePageDocument: Document)
 - `static async create(homePageDocument: Document): Promise<ClientTransaction>`：创建已初始化实例的静态工厂方法
 - `async generateTransactionId(method: string, path: string, ...): Promise<string>`：为指定的HTTP方法和API路径生成交易ID
 
-### `handleXMigration`
+### `fetchXDocument`
 
 ```ts
-async function handleXMigration(): Promise<Document>;
+async function fetchXDocument(): Promise<Document>;
 ```
 
 检索 X 响应式 Web 应用并返回 DOM 解析的 Document 对象。这使得获取 ClientTransaction 初始化所需的文档变得容易。
+
+> [!NOTE]
+> `handleXMigration` 是 `fetchXDocument` 的已弃用别名，仅为向后兼容而保留。请在新代码中使用 `fetchXDocument`。
 
 ## 免责声明
 
