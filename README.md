@@ -101,7 +101,7 @@ const apiResponse = await fetch(
 import { ClientTransaction } from "x-client-transaction-id";
 
 // Get the X responsive web app document
-const response = await fetch("https://x.com/home");
+const response = await fetch("https://x.com/i/jf/");
 const html = await response.text();
 const parser = new DOMParser();
 const document = parser.parseFromString(html, "text/html");

@@ -7,17 +7,18 @@
 import { parseHTML } from "linkedom";
 import { XHomePageFetchError } from "./errors.ts";
 
-const X_HOME_URL = "https://x.com/home";
+// The logged-out /home route now redirects to x-web, which does not expose
+// the responsive-web runtime used to locate ondemand.s.
+const X_HOME_URL = "https://x.com/i/jf/";
 
 /**
  * Fetches X's responsive web app shell and returns the HTML document.
  *
- * The `/home` route serves the full client bundle whose inline runtime
- * exposes the ondemand chunk map and guest token required for transaction
- * ID generation, even when the request is unauthenticated.
+ * The `/i/jf/` route serves the responsive-web runtime and verification key
+ * required for transaction ID generation without a logged-in session.
  *
  * @returns Promise resolving to the Document object from X's responsive web app
- * @throws {XHomePageFetchError} If the request to X's home route fails.
+ * @throws {XHomePageFetchError} If the request to X's app shell fails.
  */
 async function fetchXDocument(): Promise<Document> {
   // Set headers to mimic a browser request
@@ -41,8 +42,7 @@ async function fetchXDocument(): Promise<Document> {
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
   };
 
-  // Fetch the responsive web app shell. The bare x.com homepage can serve a
-  // separate logged-out app that no longer includes the ondemand chunk map.
+  // Fetch the responsive-web app shell, which includes the ondemand chunk map.
   const response = await fetch(X_HOME_URL, {
     headers,
   });
@@ -69,7 +69,7 @@ async function fetchXDocument(): Promise<Document> {
  *             simply delegates to {@link fetchXDocument}.
  *
  * @returns Promise resolving to the Document object from X's responsive web app
- * @throws {XHomePageFetchError} If the request to X's home route fails.
+ * @throws {XHomePageFetchError} If the request to X's app shell fails.
  */
 function handleXMigration(): Promise<Document> {
   return fetchXDocument();

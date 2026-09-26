@@ -100,7 +100,7 @@ const apiResponse = await fetch(
 import { ClientTransaction } from "x-client-transaction-id";
 
 // 获取 X 响应式 Web 应用的 HTML 文档
-const response = await fetch("https://x.com/home");
+const response = await fetch("https://x.com/i/jf/");
 const html = await response.text();
 const parser = new DOMParser();
 const document = parser.parseFromString(html, "text/html");

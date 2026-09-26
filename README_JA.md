@@ -100,7 +100,7 @@ const apiResponse = await fetch(
 import { ClientTransaction } from "x-client-transaction-id";
 
 // XのレスポンシブWebアプリのHTMLドキュメントを取得
-const response = await fetch("https://x.com/home");
+const response = await fetch("https://x.com/i/jf/");
 const html = await response.text();
 const parser = new DOMParser();
 const document = parser.parseFromString(html, "text/html");

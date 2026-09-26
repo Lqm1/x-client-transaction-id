@@ -49,7 +49,7 @@ Deno.test("fetchXDocument fetches the responsive web app document", async () => 
   try {
     const document = await fetchXDocument();
 
-    assertEquals(requestedUrls[0], "https://x.com/home");
+    assertEquals(requestedUrls[0], "https://x.com/i/jf/");
     assertEquals(document.querySelector("main")?.textContent, "ok");
   } finally {
     Object.defineProperty(globalThis, "fetch", {
@@ -155,7 +155,7 @@ Deno.test("initialize surfaces ondemand fetch failures as typed errors", async (
  * Test to verify the transaction ID generation process
  *
  * This test performs the following steps:
- * 1. Fetches the X homepage and extracts guest token for each request
+ * 1. Fetches the X app shell and extracts guest token for each request
  * 2. Creates a new ClientTransaction instance for each request
  * 3. Generates a transaction ID for a specific API endpoint
  * 4. Makes 5 API requests and verifies all of them are successful (100% success rate)
