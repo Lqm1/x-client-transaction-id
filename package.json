@@ -11,7 +11,26 @@
     "url": "https://github.com/Lqm1/x-client-transaction-id/issues"
   },
   "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    }
+  },
+  "files": ["dist", "README_JA.md", "README_CN.md"],
+  "sideEffects": false,
   "scripts": {
+    "build": "bun scripts/build.ts",
+    "prepack": "bun run build",
     "test": "bun test",
     "typecheck": "tsc"
   },
