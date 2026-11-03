@@ -11,7 +11,7 @@
 import { assertEquals } from "@std/assert";
 import { parseHTML } from "linkedom";
 import { ClientTransaction, matrixNumbers } from "../src/index.ts";
-import { decodeBase64 } from "@std/encoding";
+import { decodeBase64 } from "../src/base64.ts";
 
 // A 48-byte verification key whose animation drives a colour channel
 // to 293 before the browser's clamp (frame row and indices from the

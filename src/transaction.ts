@@ -17,7 +17,7 @@ import {
 import { interpolate } from "./interpolate.ts";
 import { convertRotationToMatrix } from "./rotation.ts";
 import { floatToHex, isOdd, matrixNumbers } from "./utils.ts";
-import { decodeBase64, encodeBase64 } from "@std/encoding";
+import { decodeBase64, encodeBase64 } from "./base64.ts";
 
 const ON_DEMAND_CHUNK_NAME = "ondemand.s";
 const INDICES_REGEX = /\(\w\[(\d{1,2})\],\s*16\)/g;

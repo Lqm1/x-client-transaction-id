@@ -37,7 +37,7 @@ import {
   isOdd,
   matrixNumbers,
 } from "./utils.ts";
-import { decodeBase64, encodeBase64 } from "@std/encoding";
+import { decodeBase64, encodeBase64 } from "./base64.ts";
 
 export {
   activateGuestToken,

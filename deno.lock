@@ -1,5 +1,5 @@
 {
-  "version": "4",
+  "version": "5",
   "specifiers": {
     "jsr:@david/code-block-writer@^13.0.2": "13.0.3",
     "jsr:@deno/cache-dir@~0.10.3": "0.10.3",
@@ -8,7 +8,6 @@
     "jsr:@std/assert@0.226": "0.226.0",
     "jsr:@std/assert@^1.0.13": "1.0.13",
     "jsr:@std/bytes@0.223": "0.223.0",
-    "jsr:@std/encoding@^1.0.10": "1.0.10",
     "jsr:@std/fmt@0.223": "0.223.0",
     "jsr:@std/fmt@1": "1.0.7",
     "jsr:@std/fs@0.223": "0.223.0",
@@ -64,9 +63,6 @@
     },
     "@std/bytes@0.223.0": {
       "integrity": "84b75052cd8680942c397c2631318772b295019098f40aac5c36cead4cba51a8"
-    },
-    "@std/encoding@1.0.10": {
-      "integrity": "8783c6384a2d13abd5e9e87a7ae0520a30e9f56aeeaa3bdf910a3eaaf5c811a1"
     },
     "@std/fmt@0.223.0": {
       "integrity": "6deb37794127dfc7d7bded2586b9fc6f5d50e62a8134846608baf71ffc1a5208"
@@ -304,7 +300,6 @@
     "dependencies": [
       "jsr:@deno/dnt@~0.41.3",
       "jsr:@std/assert@^1.0.13",
-      "jsr:@std/encoding@^1.0.10",
       "npm:linkedom@~0.18.9"
     ]
   }

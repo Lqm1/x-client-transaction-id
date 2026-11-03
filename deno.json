@@ -6,7 +6,6 @@
   "imports": {
     "@deno/dnt": "jsr:@deno/dnt@^0.41.3",
     "@std/assert": "jsr:@std/assert@^1.0.13",
-    "@std/encoding": "jsr:@std/encoding@^1.0.10",
     "linkedom": "npm:linkedom@^0.18.9"
   },
   "compilerOptions": {
