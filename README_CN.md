@@ -15,38 +15,27 @@ API发送验证请求时，此交易ID是必需的。
 
 ## 安装
 
-### 包管理器
-
-#### NPM / PNPM / Yarn
+### npm
 
 ```bash
-# NPM
 npm i x-client-transaction-id
-
-# PNPM
 pnpm i x-client-transaction-id
-
-# Yarn
 yarn add x-client-transaction-id
-```
-
-#### Deno
-
-```bash
-deno add npm:x-client-transaction-id
-```
-
-#### Bun
-
-```bash
 bun add x-client-transaction-id
 ```
 
-### 导入
+### JSR
+
+```bash
+deno add jsr:@lami/x-client-transaction-id
+npx jsr add @lami/x-client-transaction-id
+bunx jsr add @lami/x-client-transaction-id
+```
+
+从JSR安装时，请以`@lami/x-client-transaction-id`导入。Deno也可以无需安装直接导入：
 
 ```ts
-// import maps
-import { ClientTransaction } from "jsr:@lami/x-client-transaction-id@0.1.0";
+import { ClientTransaction } from "jsr:@lami/x-client-transaction-id";
 ```
 
 ## 运行时兼容性
@@ -124,7 +113,7 @@ const transactionId = await transaction.generateTransactionId(
 - `Cubic`：用于动画键生成的三次插值计算类
 - `interpolate`/`interpolateNum`：值插值的实用函数
 - `convertRotationToMatrix`：将旋转值转换为矩阵的函数
-- 其他实用函数：`floatToHex`, `isOdd`, `encodeBase64`, `decodeBase64`
+- 其他实用函数：`floatToHex`, `isOdd`, `matrixNumbers`, `encodeBase64`, `decodeBase64`
 
 ## API参考
 
@@ -156,6 +145,21 @@ async function fetchXDocument(): Promise<Document>;
 
 > [!NOTE]
 > `handleXMigration` 是 `fetchXDocument` 的已弃用别名，仅为向后兼容而保留。请在新代码中使用 `fetchXDocument`。
+
+## 开发
+
+本仓库使用[Bun](https://bun.sh)。
+
+```bash
+bun install
+bun run test:unit  # 单元测试
+bun test           # 单元测试以及针对X API的在线测试
+bun run lint       # Biome
+bun run typecheck
+bun run build      # 将npm包构建到dist/
+```
+
+发布时运行`bun pm version <patch|minor|major>`。它会同时更新`package.json`和`jsr.json`中的版本，并创建提交和标签。新版本进入`main`后，JSR工作流会发布它；推送标签后会发布到npm。
 
 ## 免责声明
 
