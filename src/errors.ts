@@ -40,8 +40,7 @@ class ClientTransactionInitializationError extends ClientTransactionError {
 }
 
 /** Error thrown when the ondemand file URL cannot be resolved from the homepage runtime. */
-class OnDemandFileUrlResolutionError
-  extends ClientTransactionInitializationError {
+class OnDemandFileUrlResolutionError extends ClientTransactionInitializationError {
   constructor() {
     super(
       "Unable to resolve the X ondemand chunk URL from the homepage runtime.",
@@ -74,19 +73,16 @@ class OnDemandFileFetchError extends ClientTransactionInitializationError {
 }
 
 /** Error thrown when key byte indices cannot be extracted from the ondemand chunk. */
-class KeyByteIndicesExtractionError
-  extends ClientTransactionInitializationError {
+class KeyByteIndicesExtractionError extends ClientTransactionInitializationError {
   constructor() {
-    super(
-      "Unable to extract key byte indices from the X ondemand chunk.",
-      { code: "KEY_BYTE_INDICES_EXTRACTION_ERROR" },
-    );
+    super("Unable to extract key byte indices from the X ondemand chunk.", {
+      code: "KEY_BYTE_INDICES_EXTRACTION_ERROR",
+    });
   }
 }
 
 /** Error thrown when the twitter-site-verification meta tag is not found. */
-class SiteVerificationKeyNotFoundError
-  extends ClientTransactionInitializationError {
+class SiteVerificationKeyNotFoundError extends ClientTransactionInitializationError {
   constructor() {
     super(
       "Unable to find the twitter-site-verification meta tag in the homepage document.",
@@ -163,10 +159,9 @@ class XHomePageFetchError extends HandleXMigrationError {
    * @param statusText HTTP status text
    */
   constructor(status: number, statusText: string) {
-    super(
-      `Unable to fetch the X homepage: ${status} ${statusText}.`,
-      { code: "X_HOMEPAGE_FETCH_ERROR" },
-    );
+    super(`Unable to fetch the X homepage: ${status} ${statusText}.`, {
+      code: "X_HOMEPAGE_FETCH_ERROR",
+    });
     this.status = status;
     this.statusText = statusText;
   }
@@ -215,10 +210,9 @@ class XMigrationFormError extends HandleXMigrationError {
    * @param statusText HTTP status text
    */
   constructor(status: number, statusText: string) {
-    super(
-      `Unable to submit the X migration form: ${status} ${statusText}.`,
-      { code: "X_MIGRATION_FORM_ERROR" },
-    );
+    super(`Unable to submit the X migration form: ${status} ${statusText}.`, {
+      code: "X_MIGRATION_FORM_ERROR",
+    });
     this.status = status;
     this.statusText = statusText;
   }

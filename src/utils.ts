@@ -82,17 +82,14 @@ function handleXMigration(): Promise<Document> {
  */
 async function activateGuestToken(): Promise<string | null> {
   try {
-    const response = await fetch(
-      "https://api.x.com/1.1/guest/activate.json",
-      {
-        method: "POST",
-        headers: {
-          authorization:
-            "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",
-          "content-type": "application/json",
-        },
+    const response = await fetch("https://api.x.com/1.1/guest/activate.json", {
+      method: "POST",
+      headers: {
+        authorization:
+          "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",
+        "content-type": "application/json",
       },
-    );
+    });
     if (!response.ok) {
       return null;
     }

@@ -9,7 +9,8 @@
  *
  * @module
  */
-import ClientTransaction from "./transaction.ts";
+
+import { decodeBase64, encodeBase64 } from "./base64.ts";
 import Cubic from "./cubic.ts";
 import {
   AnimationFrameDataError,
@@ -29,6 +30,7 @@ import {
 } from "./errors.ts";
 import { interpolate, interpolateNum } from "./interpolate.ts";
 import { convertRotationToMatrix } from "./rotation.ts";
+import ClientTransaction from "./transaction.ts";
 import {
   activateGuestToken,
   fetchXDocument,
@@ -37,29 +39,28 @@ import {
   isOdd,
   matrixNumbers,
 } from "./utils.ts";
-import { decodeBase64, encodeBase64 } from "./base64.ts";
 
 export {
-  activateGuestToken,
   AnimationFrameDataError,
+  activateGuestToken,
   ClientTransaction,
   ClientTransactionError,
   ClientTransactionInitializationError,
   ClientTransactionNotInitializedError,
-  convertRotationToMatrix,
   Cubic,
+  convertRotationToMatrix,
   /** Decodes a base64-encoded string into a Uint8Array. */
   decodeBase64,
   /** Encodes data to a base64-encoded string. */
   encodeBase64,
   fetchXDocument,
   floatToHex,
-  handleXMigration,
   HandleXMigrationError,
+  handleXMigration,
   IndicesNotInitializedError,
+  InterpolationInputError,
   interpolate,
   interpolateNum,
-  InterpolationInputError,
   isOdd,
   KeyByteIndicesExtractionError,
   matrixNumbers,

@@ -4,6 +4,8 @@
  * This module provides functionality to generate the x-client-transaction-id
  * header value required for authenticated API requests to X.
  */
+
+import { decodeBase64, encodeBase64 } from "./base64.ts";
 import Cubic from "./cubic.ts";
 import {
   AnimationFrameDataError,
@@ -17,7 +19,6 @@ import {
 import { interpolate } from "./interpolate.ts";
 import { convertRotationToMatrix } from "./rotation.ts";
 import { floatToHex, isOdd, matrixNumbers } from "./utils.ts";
-import { decodeBase64, encodeBase64 } from "./base64.ts";
 
 const ON_DEMAND_CHUNK_NAME = "ondemand.s";
 const INDICES_REGEX = /\(\w\[(\d{1,2})\],\s*16\)/g;
@@ -71,8 +72,8 @@ class ClientTransaction {
     if (this.isInitialized) return;
 
     // Initialize indices
-    [this.DEFAULT_ROW_INDEX, this.DEFAULT_KEY_BYTES_INDICES] = await this
-      .getIndices(this.homePageDocument);
+    [this.DEFAULT_ROW_INDEX, this.DEFAULT_KEY_BYTES_INDICES] =
+      await this.getIndices(this.homePageDocument);
 
     // Get key from document
     this.key = this.getKey(this.homePageDocument);
@@ -126,10 +127,7 @@ class ClientTransaction {
 
     const responseText = await onDemandFileResponse.text();
 
-    // Extract indices using regex
-    let match: RegExpExecArray | null;
-    INDICES_REGEX.lastIndex = 0; // Reset regex index
-    while ((match = INDICES_REGEX.exec(responseText)) !== null) {
+    for (const match of responseText.matchAll(INDICES_REGEX)) {
       keyByteIndices.push(match[1]);
     }
 
@@ -229,7 +227,7 @@ class ClientTransaction {
       frames = this.getFrames(response);
     }
 
-    if (!frames || !frames.length) {
+    if (!frames?.length) {
       return [[]]; // Return empty 2D array
     }
 
@@ -290,7 +288,7 @@ class ClientTransaction {
 
     const remainingFrames = frames.slice(7);
     const curves = remainingFrames.map((item, counter) =>
-      this.solve(item, isOdd(counter), 1.0, false)
+      this.solve(item, isOdd(counter), 1.0, false),
     );
 
     const cubic = new Cubic(curves);
@@ -298,7 +296,7 @@ class ClientTransaction {
     // The eased value can overshoot [0, 1]; the browser clamps colour
     // channels to 0..255, otherwise e.g. 293 prints as "125" not "ff"
     const color = interpolate(fromColor, toColor, val).map((value) =>
-      Math.max(0, Math.min(255, value))
+      Math.max(0, Math.min(255, value)),
     );
     const rotation = interpolate(fromRotation, toRotation, val);
     const matrix = convertRotationToMatrix(rotation[0]);
@@ -312,8 +310,9 @@ class ClientTransaction {
     // digits) and applies Number(x.toFixed(2)) to each extracted number
     for (const value of matrix) {
       for (const token of matrixNumbers(value)) {
-        const hexValue = floatToHex(Math.abs(Number(token.toFixed(2))))
-          .toLowerCase();
+        const hexValue = floatToHex(
+          Math.abs(Number(token.toFixed(2))),
+        ).toLowerCase();
         strArr.push(
           hexValue.startsWith(".") ? `0${hexValue}` : hexValue || "0",
         );
@@ -336,7 +335,8 @@ class ClientTransaction {
     const totalTime = 4096;
 
     if (
-      this.DEFAULT_ROW_INDEX == null || this.DEFAULT_KEY_BYTES_INDICES == null
+      this.DEFAULT_ROW_INDEX == null ||
+      this.DEFAULT_KEY_BYTES_INDICES == null
     ) {
       throw new IndicesNotInitializedError();
     }
@@ -350,7 +350,7 @@ class ClientTransaction {
     frameTime = Math.round(frameTime / 10) * 10;
 
     const arr = this.get2dArray(keyBytes, response);
-    if (!arr || !arr[rowIndex]) {
+    if (!arr?.[rowIndex]) {
       throw new AnimationFrameDataError(rowIndex);
     }
 
@@ -396,13 +396,13 @@ class ClientTransaction {
     const keyBytes = key
       ? this.getKeyBytes(key)
       : this.keyBytes || this.getKeyBytes(key);
-    animationKey = animationKey ||
+    animationKey =
+      animationKey ||
       this.animationKey ||
       this.getAnimationKey(keyBytes, response);
 
     // Generate hash data
-    const data =
-      `${method}!${path}!${timeNow}${ClientTransaction.DEFAULT_KEYWORD}${animationKey}`;
+    const data = `${method}!${path}!${timeNow}${ClientTransaction.DEFAULT_KEYWORD}${animationKey}`;
 
     // Calculate SHA-256 hash
     const encoder = new TextEncoder();

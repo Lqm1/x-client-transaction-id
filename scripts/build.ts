@@ -3,8 +3,9 @@
  * next to a copy of the type declarations. dist/cjs carries its own
  * package.json so Node.js and TypeScript treat that directory as CommonJS.
  */
-import { $ } from "bun";
+
 import { cp, rm } from "node:fs/promises";
+import { $ } from "bun";
 
 const outdir = "dist";
 

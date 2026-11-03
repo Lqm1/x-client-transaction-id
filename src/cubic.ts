@@ -114,7 +114,8 @@ class Cubic {
       if (x <= this.splineSamples[i]) {
         t1 = deltaT * i;
         t0 = t1 - deltaT;
-        t2 = t0 +
+        t2 =
+          t0 +
           ((t1 - t0) * (x - this.splineSamples[i - 1])) /
             (this.splineSamples[i] - this.splineSamples[i - 1]);
         break;

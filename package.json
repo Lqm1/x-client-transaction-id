@@ -27,11 +27,17 @@
       }
     }
   },
-  "files": ["dist", "README_JA.md", "README_CN.md"],
+  "files": [
+    "dist",
+    "README_JA.md",
+    "README_CN.md"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "bun scripts/build.ts",
     "prepack": "bun run build",
+    "format": "biome check --write",
+    "lint": "biome check",
     "test": "bun test",
     "typecheck": "tsc"
   },
@@ -39,6 +45,7 @@
     "linkedom": "^0.18.15"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.6.4",
     "@types/bun": "^1.4.4",
     "typescript": "^7.0.2"
   }

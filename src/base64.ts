@@ -10,9 +10,10 @@
  * @returns The base64-encoded string
  */
 export function encodeBase64(data: ArrayBuffer | Uint8Array | string): string {
-  const bytes = typeof data === "string"
-    ? new TextEncoder().encode(data)
-    : new Uint8Array(data);
+  const bytes =
+    typeof data === "string"
+      ? new TextEncoder().encode(data)
+      : new Uint8Array(data);
   return btoa(Array.from(bytes, (byte) => String.fromCharCode(byte)).join(""));
 }
 

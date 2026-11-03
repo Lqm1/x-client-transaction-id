@@ -10,8 +10,8 @@ import {
   ClientTransaction,
   ClientTransactionNotInitializedError,
   fetchXDocument,
-  interpolate,
   InterpolationInputError,
+  interpolate,
   OnDemandFileFetchError,
   SiteVerificationKeyNotFoundError,
 } from "../src/index.ts";
@@ -44,9 +44,7 @@ test("interpolate throws a typed error for mismatched input lengths", () => {
 });
 
 test("generateTransactionId requires initialization", async () => {
-  const document = createDocument(
-    "<html><head></head><body></body></html>",
-  );
+  const document = createDocument("<html><head></head><body></body></html>");
   const transaction = new ClientTransaction(document);
 
   const error = await transaction
@@ -208,20 +206,14 @@ test(
     }
 
     console.log(
-      `Successful requests: ${successfulRequests}/${totalRequests} (${
-        (
-          (successfulRequests / totalRequests) *
-          100
-        ).toFixed(2)
-      }%)`,
+      `Successful requests: ${successfulRequests}/${totalRequests} (${(
+        (successfulRequests / totalRequests) * 100
+      ).toFixed(2)}%)`,
     );
     console.log(
-      `404 Not Found errors: ${notFoundErrors}/${totalRequests} (${
-        (
-          (notFoundErrors / totalRequests) *
-          100
-        ).toFixed(2)
-      }%)`,
+      `404 Not Found errors: ${notFoundErrors}/${totalRequests} (${(
+        (notFoundErrors / totalRequests) * 100
+      ).toFixed(2)}%)`,
     );
 
     if (

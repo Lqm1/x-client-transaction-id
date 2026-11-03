@@ -10,8 +10,8 @@
  */
 import { afterEach, expect, mock, spyOn, test } from "bun:test";
 import { parseHTML } from "linkedom";
-import { ClientTransaction, matrixNumbers } from "../src/index.ts";
 import { decodeBase64 } from "../src/base64.ts";
+import { ClientTransaction, matrixNumbers } from "../src/index.ts";
 
 // A 48-byte verification key whose animation drives a colour channel
 // to 293 before the browser's clamp (frame row and indices from the
@@ -63,8 +63,8 @@ test("matrixNumbers reads the numbers X's script reads from a matrix entry", () 
     [0.7190094, [0.719009]],
     [-0.69499999999, [-0.695]],
     // "5.68575e-05": the exponent is a second number
-    [5.68575e-05, [5.68575, -5]],
-    [-9.67769e-06, [-9.67769, -6]],
+    [5.68575e-5, [5.68575, -5]],
+    [-9.67769e-6, [-9.67769, -6]],
     [0.0001234567, [0.000123457]],
     [-0, [0]],
   ];
