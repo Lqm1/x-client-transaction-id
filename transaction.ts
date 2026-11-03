@@ -295,10 +295,8 @@ class ClientTransaction {
 
     const cubic = new Cubic(curves);
     const val = cubic.getValue(targetTime);
-    // The browser clamps every colour channel to 0..255 when it
-    // serialises the computed colour. The eased value can overshoot
-    // [0, 1], so an unclamped channel can round above 255 and print as
-    // three hex digits ("125" instead of "ff"), which X rejects.
+    // The eased value can overshoot [0, 1]; the browser clamps colour
+    // channels to 0..255, otherwise e.g. 293 prints as "125" not "ff"
     const color = interpolate(fromColor, toColor, val).map((value) =>
       Math.max(0, Math.min(255, value))
     );
@@ -310,11 +308,8 @@ class ClientTransaction {
       .slice(0, -1)
       .map((value) => Math.round(value).toString(16));
 
-    // X's script reads the matrix back from the computed style as
-    // printed text and applies Number(x.toFixed(2)) to each number it
-    // extracts, so reproduce that path instead of rounding the raw
-    // double: the printed form has six significant digits, and a value
-    // such as 0.695 rounds differently from Math.round(value * 100).
+    // X's script reads the matrix from its printed form (six significant
+    // digits) and applies Number(x.toFixed(2)) to each extracted number
     for (const value of matrix) {
       for (const token of matrixNumbers(value)) {
         const hexValue = floatToHex(Math.abs(Number(token.toFixed(2))))

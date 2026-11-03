@@ -81,7 +81,7 @@ class Cubic {
     if (time > 1) {
       return 1.0 + this.endGradient * (time - 1.0);
     }
-    return this.sampleY(this.solveCurveX(time, Cubic.EPSILON));
+    return this.sampleY(this.solveCurveX(time));
   }
 
   private sampleX(t: number): number {
@@ -100,11 +100,10 @@ class Cubic {
    * Finds t with sampleX(t) ~= x, following gfx::CubicBezier::SolveCurveX:
    * a spline-interpolated first guess, Newton's method, then bisection.
    * @param x Target x value
-   * @param epsilon Tolerance for the bisection stage
    * @returns The t closest to the solution
    * @private
    */
-  private solveCurveX(x: number, epsilon: number): number {
+  private solveCurveX(x: number): number {
     let t0 = 0.0;
     let t1 = 1.0;
     let t2 = x;
@@ -125,10 +124,9 @@ class Cubic {
     // Newton's method. x2 keeps the residual of the last point evaluated,
     // which is the one before the final step; Chromium tests that value too.
     let x2 = 0;
-    const newtonEpsilon = Math.min(Cubic.EPSILON, epsilon);
     for (let i = 0; i < Cubic.NEWTON_ITERATIONS; i++) {
       x2 = this.sampleX(t2) - x;
-      if (Math.abs(x2) < newtonEpsilon) {
+      if (Math.abs(x2) < Cubic.EPSILON) {
         return t2;
       }
       const d2 = this.sampleDerivativeX(t2);
@@ -137,14 +135,14 @@ class Cubic {
       }
       t2 -= x2 / d2;
     }
-    if (Math.abs(x2) < epsilon) {
+    if (Math.abs(x2) < Cubic.EPSILON) {
       return t2;
     }
 
     // Bisection, for reliability
     while (t0 < t1) {
       x2 = this.sampleX(t2);
-      if (Math.abs(x2 - x) < epsilon) {
+      if (Math.abs(x2 - x) < Cubic.EPSILON) {
         return t2;
       }
       if (x > x2) {

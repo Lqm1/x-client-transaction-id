@@ -209,15 +209,7 @@ function formatMatrixValue(value: number): string {
  * @returns The numbers the script would extract from its printed form
  */
 function matrixNumbers(value: number): number[] {
-  const tokens = formatMatrixValue(value).match(/[\d.-]+/g) ?? [];
-  const numbers: number[] = [];
-  for (const token of tokens) {
-    const num = Number(token);
-    if (!Number.isNaN(num)) {
-      numbers.push(num);
-    }
-  }
-  return numbers;
+  return (formatMatrixValue(value).match(/[\d.-]+/g) ?? []).map(Number);
 }
 
 export {
