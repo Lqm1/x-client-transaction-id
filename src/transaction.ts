@@ -5,6 +5,7 @@
  * header value required for authenticated API requests to X.
  */
 
+import { matrixNumbers } from "./animation.ts";
 import { decodeBase64, encodeBase64 } from "./base64.ts";
 import Cubic from "./cubic.ts";
 import {
@@ -16,9 +17,12 @@ import {
   OnDemandFileUrlResolutionError,
   SiteVerificationKeyNotFoundError,
 } from "./errors.ts";
-import { interpolate } from "./interpolate.ts";
-import { convertRotationToMatrix } from "./rotation.ts";
-import { floatToHex, isOdd, matrixNumbers } from "./utils.ts";
+import {
+  convertRotationToMatrix,
+  floatToHex,
+  interpolate,
+  isOdd,
+} from "./math.ts";
 
 const ON_DEMAND_CHUNK_NAME = "ondemand.s";
 const INDICES_REGEX = /\(\w\[(\d{1,2})\],\s*16\)/g;

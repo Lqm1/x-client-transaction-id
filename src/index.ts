@@ -1,18 +1,27 @@
 /**
- * @lami/x-client-transaction-id
+ * Generates the `x-client-transaction-id` header value that X (formerly
+ * Twitter) requires on requests to its web API.
  *
- * A library for generating client transaction IDs required for
- * authenticated API requests to X (formerly Twitter).
+ * @example
+ * ```ts
+ * import { ClientTransaction, fetchXDocument } from "@lami/x-client-transaction-id";
  *
- * This module exports the main ClientTransaction class and utility functions
- * needed to generate valid x-client-transaction-id headers for X API requests.
+ * const document = await fetchXDocument();
+ * const transaction = await ClientTransaction.create(document);
+ * const transactionId = await transaction.generateTransactionId(
+ *   "GET",
+ *   "/1.1/jot/client_event.json",
+ * );
+ * ```
  *
  * @module
  */
+import ClientTransaction from "./transaction.ts";
 
-import { decodeBase64, encodeBase64 } from "./base64.ts";
-import Cubic from "./cubic.ts";
-import {
+export { matrixNumbers } from "./animation.ts";
+export { decodeBase64, encodeBase64 } from "./base64.ts";
+export { default as Cubic } from "./cubic.ts";
+export {
   AnimationFrameDataError,
   ClientTransactionError,
   ClientTransactionInitializationError,
@@ -28,48 +37,17 @@ import {
   XMigrationFormError,
   XMigrationRedirectionError,
 } from "./errors.ts";
-import { interpolate, interpolateNum } from "./interpolate.ts";
-import { convertRotationToMatrix } from "./rotation.ts";
-import ClientTransaction from "./transaction.ts";
-import {
-  activateGuestToken,
-  fetchXDocument,
-  floatToHex,
-  handleXMigration,
-  isOdd,
-  matrixNumbers,
-} from "./utils.ts";
-
 export {
-  AnimationFrameDataError,
-  activateGuestToken,
-  ClientTransaction,
-  ClientTransactionError,
-  ClientTransactionInitializationError,
-  ClientTransactionNotInitializedError,
-  Cubic,
   convertRotationToMatrix,
-  /** Decodes a base64-encoded string into a Uint8Array. */
-  decodeBase64,
-  /** Encodes data to a base64-encoded string. */
-  encodeBase64,
-  fetchXDocument,
   floatToHex,
-  HandleXMigrationError,
-  handleXMigration,
-  IndicesNotInitializedError,
-  InterpolationInputError,
   interpolate,
   interpolateNum,
   isOdd,
-  KeyByteIndicesExtractionError,
-  matrixNumbers,
-  OnDemandFileFetchError,
-  OnDemandFileUrlResolutionError,
-  SiteVerificationKeyNotFoundError,
-  XHomePageFetchError,
-  XMigrationFormError,
-  XMigrationRedirectionError,
-};
-
+} from "./math.ts";
+export {
+  activateGuestToken,
+  fetchXDocument,
+  handleXMigration,
+} from "./x-api.ts";
+export { ClientTransaction };
 export default ClientTransaction;
