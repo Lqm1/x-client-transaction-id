@@ -1,0 +1,56 @@
+{
+  "name": "x-client-transaction-id",
+  "version": "0.3.2",
+  "description": "Client Transaction ID generator library for X (formerly Twitter) API requests",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lqm1/x-client-transaction-id.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Lqm1/x-client-transaction-id/issues"
+  },
+  "type": "module",
+  "packageManager": "bun@1.4.4",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README_JA.md",
+    "README_CN.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "bun scripts/build.ts",
+    "check:package": "attw --pack .",
+    "format": "biome check --write",
+    "lint": "biome check",
+    "prepack": "bun run build",
+    "test": "bun test",
+    "test:unit": "bun test --path-ignore-patterns='**/live.test.ts'",
+    "typecheck": "bun check",
+    "version": "bun scripts/sync-jsr-version.ts && git add jsr.json"
+  },
+  "dependencies": {
+    "linkedom": "^0.18.15"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@biomejs/biome": "2.6.4",
+    "@types/bun": "^1.4.4",
+    "typescript": "^7.0.2"
+  }
+}

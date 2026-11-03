@@ -1,8 +1,6 @@
 /**
- * Cubic Bezier interpolation implementation
- *
- * This module implements the cubic bezier easing used in the animation
- * key generation process.
+ * Cubic Bézier easing curve, evaluated the way Chromium evaluates CSS
+ * easing functions.
  *
  * X runs the easing as a CSS animation in the browser, so the value to
  * match is the one Chromium computes. This is a port of Chromium's
@@ -12,20 +10,21 @@
  * 1e-7. Plain bisection to 1e-5 returns a different t for a small
  * fraction of curves and moves a printed digit of the animation key.
  */
-class Cubic {
+export class Cubic {
   private static readonly EPSILON = 1e-7;
   private static readonly NEWTON_ITERATIONS = 4;
   private static readonly SPLINE_SAMPLES = 11;
+  private static readonly SPLINE_STEP = 1.0 / (Cubic.SPLINE_SAMPLES - 1);
 
-  private ax: number;
-  private bx: number;
-  private cx: number;
-  private ay: number;
-  private by: number;
-  private cy: number;
-  private startGradient: number;
-  private endGradient: number;
-  private splineSamples: number[];
+  private readonly ax: number;
+  private readonly bx: number;
+  private readonly cx: number;
+  private readonly ay: number;
+  private readonly by: number;
+  private readonly cy: number;
+  private readonly startGradient: number;
+  private readonly endGradient: number;
+  private readonly splineSamples: number[];
 
   /**
    * Creates a new Cubic instance
@@ -62,11 +61,9 @@ class Cubic {
       this.endGradient = 0;
     }
 
-    const deltaT = 1.0 / (Cubic.SPLINE_SAMPLES - 1);
-    this.splineSamples = [];
-    for (let i = 0; i < Cubic.SPLINE_SAMPLES; i++) {
-      this.splineSamples.push(this.sampleX(i * deltaT));
-    }
+    this.splineSamples = Array.from({ length: Cubic.SPLINE_SAMPLES }, (_, i) =>
+      this.sampleX(i * Cubic.SPLINE_STEP),
+    );
   }
 
   /**
@@ -84,14 +81,17 @@ class Cubic {
     return this.sampleY(this.solveCurveX(time));
   }
 
+  /** x(t) of the curve */
   private sampleX(t: number): number {
     return ((this.ax * t + this.bx) * t + this.cx) * t;
   }
 
+  /** y(t) of the curve */
   private sampleY(t: number): number {
     return ((this.ay * t + this.by) * t + this.cy) * t;
   }
 
+  /** dx/dt of the curve at t */
   private sampleDerivativeX(t: number): number {
     return (3.0 * this.ax * t + 2.0 * this.bx) * t + this.cx;
   }
@@ -101,7 +101,6 @@ class Cubic {
    * a spline-interpolated first guess, Newton's method, then bisection.
    * @param x Target x value
    * @returns The t closest to the solution
-   * @private
    */
   private solveCurveX(x: number): number {
     let t0 = 0.0;
@@ -109,12 +108,12 @@ class Cubic {
     let t2 = x;
 
     // First guess: interpolate within the spline sample bracket containing x
-    const deltaT = 1.0 / (Cubic.SPLINE_SAMPLES - 1);
     for (let i = 1; i < Cubic.SPLINE_SAMPLES; i++) {
       if (x <= this.splineSamples[i]) {
-        t1 = deltaT * i;
-        t0 = t1 - deltaT;
-        t2 = t0 +
+        t1 = Cubic.SPLINE_STEP * i;
+        t0 = t1 - Cubic.SPLINE_STEP;
+        t2 =
+          t0 +
           ((t1 - t0) * (x - this.splineSamples[i - 1])) /
             (this.splineSamples[i] - this.splineSamples[i - 1]);
         break;
@@ -155,5 +154,3 @@ class Cubic {
     return t2;
   }
 }
-
-export default Cubic;

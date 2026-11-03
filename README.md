@@ -16,38 +16,28 @@ is necessary when making authenticated requests to X APIs.
 
 ## Installation
 
-### Package Managers
-
-#### NPM / PNPM / Yarn
+### npm
 
 ```bash
-# NPM
 npm i x-client-transaction-id
-
-# PNPM
 pnpm i x-client-transaction-id
-
-# Yarn
 yarn add x-client-transaction-id
-```
-
-#### Deno
-
-```bash
-deno add npm:x-client-transaction-id
-```
-
-#### Bun
-
-```bash
 bun add x-client-transaction-id
 ```
 
-### Import
+### JSR
+
+```bash
+deno add jsr:@lami/x-client-transaction-id
+npx jsr add @lami/x-client-transaction-id
+bunx jsr add @lami/x-client-transaction-id
+```
+
+When installed from JSR, import the package as
+`@lami/x-client-transaction-id`. Deno can also import it without installing:
 
 ```ts
-// import maps
-import { ClientTransaction } from "jsr:@lami/x-client-transaction-id@0.1.0";
+import { ClientTransaction } from "jsr:@lami/x-client-transaction-id";
 ```
 
 ## Runtime Compatibility
@@ -129,7 +119,8 @@ const transactionId = await transaction.generateTransactionId(
   generation
 - `interpolate`/`interpolateNum`: Utility functions for value interpolation
 - `convertRotationToMatrix`: Function to convert rotation values to matrices
-- Other utility functions: `floatToHex`, `isOdd`, `encodeBase64`, `decodeBase64`
+- Other utility functions: `floatToHex`, `isOdd`, `matrixNumbers`,
+  `encodeBase64`, `decodeBase64`
 
 ## API Reference
 
@@ -167,6 +158,24 @@ initialization.
 > [!NOTE]
 > `handleXMigration` is a deprecated alias for `fetchXDocument` and is retained
 > only for backward compatibility. Prefer `fetchXDocument` in new code.
+
+## Development
+
+This repository uses [Bun](https://bun.sh).
+
+```bash
+bun install
+bun run test:unit  # unit tests
+bun test           # unit tests plus a live test against X's API
+bun run lint       # Biome
+bun run typecheck
+bun run build      # builds the npm package into dist/
+```
+
+To release, run `bun pm version <patch|minor|major>`. It bumps the version in
+both `package.json` and `jsr.json`, then commits the change and tags it as
+`v1.2.3`. The JSR workflow publishes each new version that reaches `main`, and
+pushing a `v*` tag publishes it to npm.
 
 ## Disclaimer
 

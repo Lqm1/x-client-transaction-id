@@ -2,14 +2,17 @@
  * Custom error types for x-client-transaction-id.
  */
 
-/** Options for constructing error instances with an optional cause and code. */
-type ErrorOptionsWithCode = {
+/** Options accepted by the constructors of the base error classes. */
+export interface ClientTransactionErrorOptions {
+  /** The underlying error, exposed as `Error#cause` */
   cause?: unknown;
+  /** Machine-readable error code; each class has its own default */
   code?: string;
-};
+}
 
 /** Base error class for all client transaction related errors. */
-class ClientTransactionError extends Error {
+export class ClientTransactionError extends Error {
+  /** Machine-readable error code, such as `ONDEMAND_FILE_FETCH_ERROR` */
   readonly code: string;
 
   /**
@@ -17,7 +20,7 @@ class ClientTransactionError extends Error {
    * @param message Error message
    * @param options Optional cause and error code
    */
-  constructor(message: string, options: ErrorOptionsWithCode = {}) {
+  constructor(message: string, options: ClientTransactionErrorOptions = {}) {
     super(message, options.cause ? { cause: options.cause } : undefined);
     this.name = new.target.name;
     this.code = options.code ?? "CLIENT_TRANSACTION_ERROR";
@@ -25,13 +28,13 @@ class ClientTransactionError extends Error {
 }
 
 /** Error thrown when ClientTransaction initialization fails. */
-class ClientTransactionInitializationError extends ClientTransactionError {
+export class ClientTransactionInitializationError extends ClientTransactionError {
   /**
    * Creates a new ClientTransactionInitializationError.
    * @param message Error message
    * @param options Optional cause and error code
    */
-  constructor(message: string, options: ErrorOptionsWithCode = {}) {
+  constructor(message: string, options: ClientTransactionErrorOptions = {}) {
     super(message, {
       code: options.code ?? "CLIENT_TRANSACTION_INITIALIZATION_ERROR",
       cause: options.cause,
@@ -40,8 +43,7 @@ class ClientTransactionInitializationError extends ClientTransactionError {
 }
 
 /** Error thrown when the ondemand file URL cannot be resolved from the homepage runtime. */
-class OnDemandFileUrlResolutionError
-  extends ClientTransactionInitializationError {
+export class OnDemandFileUrlResolutionError extends ClientTransactionInitializationError {
   constructor() {
     super(
       "Unable to resolve the X ondemand chunk URL from the homepage runtime.",
@@ -51,9 +53,12 @@ class OnDemandFileUrlResolutionError
 }
 
 /** Error thrown when fetching the ondemand file fails. */
-class OnDemandFileFetchError extends ClientTransactionInitializationError {
+export class OnDemandFileFetchError extends ClientTransactionInitializationError {
+  /** URL of the ondemand chunk that was requested */
   readonly url: string;
+  /** HTTP status code of the failed response */
   readonly status: number;
+  /** HTTP status text of the failed response */
   readonly statusText: string;
 
   /**
@@ -74,19 +79,16 @@ class OnDemandFileFetchError extends ClientTransactionInitializationError {
 }
 
 /** Error thrown when key byte indices cannot be extracted from the ondemand chunk. */
-class KeyByteIndicesExtractionError
-  extends ClientTransactionInitializationError {
+export class KeyByteIndicesExtractionError extends ClientTransactionInitializationError {
   constructor() {
-    super(
-      "Unable to extract key byte indices from the X ondemand chunk.",
-      { code: "KEY_BYTE_INDICES_EXTRACTION_ERROR" },
-    );
+    super("Unable to extract key byte indices from the X ondemand chunk.", {
+      code: "KEY_BYTE_INDICES_EXTRACTION_ERROR",
+    });
   }
 }
 
 /** Error thrown when the twitter-site-verification meta tag is not found. */
-class SiteVerificationKeyNotFoundError
-  extends ClientTransactionInitializationError {
+export class SiteVerificationKeyNotFoundError extends ClientTransactionInitializationError {
   constructor() {
     super(
       "Unable to find the twitter-site-verification meta tag in the homepage document.",
@@ -95,8 +97,14 @@ class SiteVerificationKeyNotFoundError
   }
 }
 
-/** Error thrown when indices are accessed before initialization. */
-class IndicesNotInitializedError extends ClientTransactionError {
+/**
+ * Error thrown when indices are accessed before initialization.
+ *
+ * @deprecated The animation key is now computed only once the indices are
+ *             known, so this error is no longer thrown. It is retained for
+ *             backward compatibility.
+ */
+export class IndicesNotInitializedError extends ClientTransactionError {
   constructor() {
     super(
       "ClientTransaction indices are not initialized. Call initialize() before generating animation data.",
@@ -106,7 +114,8 @@ class IndicesNotInitializedError extends ClientTransactionError {
 }
 
 /** Error thrown when animation frame data cannot be built for a given row. */
-class AnimationFrameDataError extends ClientTransactionInitializationError {
+export class AnimationFrameDataError extends ClientTransactionInitializationError {
+  /** Frame row selected by the verification key */
   readonly rowIndex: number;
 
   /**
@@ -123,7 +132,7 @@ class AnimationFrameDataError extends ClientTransactionInitializationError {
 }
 
 /** Error thrown when ClientTransaction is used before initialization. */
-class ClientTransactionNotInitializedError extends ClientTransactionError {
+export class ClientTransactionNotInitializedError extends ClientTransactionError {
   constructor() {
     super(
       "ClientTransaction has not been initialized. Call initialize() or use ClientTransaction.create() first.",
@@ -138,13 +147,13 @@ class ClientTransactionNotInitializedError extends ClientTransactionError {
  * Historically named after X's now-removed domain migration flow; the class
  * is still used as the base for {@link XHomePageFetchError}.
  */
-class HandleXMigrationError extends ClientTransactionError {
+export class HandleXMigrationError extends ClientTransactionError {
   /**
    * Creates a new HandleXMigrationError.
    * @param message Error message
    * @param options Optional cause and error code
    */
-  constructor(message: string, options: ErrorOptionsWithCode = {}) {
+  constructor(message: string, options: ClientTransactionErrorOptions = {}) {
     super(message, {
       code: options.code ?? "HANDLE_X_MIGRATION_ERROR",
       cause: options.cause,
@@ -153,8 +162,10 @@ class HandleXMigrationError extends ClientTransactionError {
 }
 
 /** Error thrown when fetching the X homepage fails. */
-class XHomePageFetchError extends HandleXMigrationError {
+export class XHomePageFetchError extends HandleXMigrationError {
+  /** HTTP status code of the failed response */
   readonly status: number;
+  /** HTTP status text of the failed response */
   readonly statusText: string;
 
   /**
@@ -163,10 +174,9 @@ class XHomePageFetchError extends HandleXMigrationError {
    * @param statusText HTTP status text
    */
   constructor(status: number, statusText: string) {
-    super(
-      `Unable to fetch the X homepage: ${status} ${statusText}.`,
-      { code: "X_HOMEPAGE_FETCH_ERROR" },
-    );
+    super(`Unable to fetch the X homepage: ${status} ${statusText}.`, {
+      code: "X_HOMEPAGE_FETCH_ERROR",
+    });
     this.status = status;
     this.statusText = statusText;
   }
@@ -179,8 +189,10 @@ class XHomePageFetchError extends HandleXMigrationError {
  *             retained only for backward compatibility and is no longer
  *             thrown by the library.
  */
-class XMigrationRedirectionError extends HandleXMigrationError {
+export class XMigrationRedirectionError extends HandleXMigrationError {
+  /** HTTP status code of the failed response */
   readonly status: number;
+  /** HTTP status text of the failed response */
   readonly statusText: string;
 
   /**
@@ -205,8 +217,10 @@ class XMigrationRedirectionError extends HandleXMigrationError {
  *             retained only for backward compatibility and is no longer
  *             thrown by the library.
  */
-class XMigrationFormError extends HandleXMigrationError {
+export class XMigrationFormError extends HandleXMigrationError {
+  /** HTTP status code of the failed response */
   readonly status: number;
+  /** HTTP status text of the failed response */
   readonly statusText: string;
 
   /**
@@ -215,18 +229,19 @@ class XMigrationFormError extends HandleXMigrationError {
    * @param statusText HTTP status text
    */
   constructor(status: number, statusText: string) {
-    super(
-      `Unable to submit the X migration form: ${status} ${statusText}.`,
-      { code: "X_MIGRATION_FORM_ERROR" },
-    );
+    super(`Unable to submit the X migration form: ${status} ${statusText}.`, {
+      code: "X_MIGRATION_FORM_ERROR",
+    });
     this.status = status;
     this.statusText = statusText;
   }
 }
 
 /** Error thrown when interpolation inputs have mismatched lengths. */
-class InterpolationInputError extends ClientTransactionError {
+export class InterpolationInputError extends ClientTransactionError {
+  /** Length of the `fromList` array */
   readonly fromLength: number;
+  /** Length of the `toList` array */
   readonly toLength: number;
 
   /**
@@ -243,20 +258,3 @@ class InterpolationInputError extends ClientTransactionError {
     this.toLength = toLength;
   }
 }
-
-export {
-  AnimationFrameDataError,
-  ClientTransactionError,
-  ClientTransactionInitializationError,
-  ClientTransactionNotInitializedError,
-  HandleXMigrationError,
-  IndicesNotInitializedError,
-  InterpolationInputError,
-  KeyByteIndicesExtractionError,
-  OnDemandFileFetchError,
-  OnDemandFileUrlResolutionError,
-  SiteVerificationKeyNotFoundError,
-  XHomePageFetchError,
-  XMigrationFormError,
-  XMigrationRedirectionError,
-};

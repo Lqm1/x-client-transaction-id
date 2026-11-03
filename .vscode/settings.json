@@ -1,5 +1,4 @@
 {
   "editor.tabSize": 2,
-  "deno.enable": true,
-  "editor.defaultFormatter": "denoland.vscode-deno"
+  "editor.defaultFormatter": "biomejs.biome"
 }

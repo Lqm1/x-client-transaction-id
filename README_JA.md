@@ -15,38 +15,27 @@ APIに対する認証済みリクエストを行う際に必要となります�
 
 ## インストール
 
-### パッケージマネージャー
-
-#### NPM / PNPM / Yarn
+### npm
 
 ```bash
-# NPM
 npm i x-client-transaction-id
-
-# PNPM
 pnpm i x-client-transaction-id
-
-# Yarn
 yarn add x-client-transaction-id
-```
-
-#### Deno
-
-```bash
-deno add npm:x-client-transaction-id
-```
-
-#### Bun
-
-```bash
 bun add x-client-transaction-id
 ```
 
-### インポート
+### JSR
+
+```bash
+deno add jsr:@lami/x-client-transaction-id
+npx jsr add @lami/x-client-transaction-id
+bunx jsr add @lami/x-client-transaction-id
+```
+
+JSRからインストールした場合は、`@lami/x-client-transaction-id`としてインポートします。Denoではインストールせずに直接インポートすることもできます。
 
 ```ts
-// import maps
-import { ClientTransaction } from "jsr:@lami/x-client-transaction-id@0.1.0";
+import { ClientTransaction } from "jsr:@lami/x-client-transaction-id";
 ```
 
 ## ランタイム互換性
@@ -127,8 +116,8 @@ const transactionId = await transaction.generateTransactionId(
 - `Cubic`: アニメーションキー生成のための3次補間計算を行うクラス
 - `interpolate`/`interpolateNum`: 値の補間を行うユーティリティ関数
 - `convertRotationToMatrix`: 回転値を行列に変換する関数
-- その他ユーティリティ関数: `floatToHex`, `isOdd`, `encodeBase64`,
-  `decodeBase64`
+- その他ユーティリティ関数: `floatToHex`, `isOdd`, `matrixNumbers`,
+  `encodeBase64`, `decodeBase64`
 
 ## APIリファレンス
 
@@ -163,6 +152,21 @@ XのレスポンシブWebアプリを取得し、DOMパースしたDocumentオ�
 
 > [!NOTE]
 > `handleXMigration` は `fetchXDocument` の非推奨エイリアスであり、後方互換性のためだけに残されています。新規コードでは `fetchXDocument` を使用してください。
+
+## 開発
+
+このリポジトリは[Bun](https://bun.sh)を使用しています。
+
+```bash
+bun install
+bun run test:unit  # ユニットテスト
+bun test           # ユニットテストに加え、XのAPIに対するライブテストも実行
+bun run lint       # Biome
+bun run typecheck
+bun run build      # npmパッケージをdist/にビルド
+```
+
+リリースするには`bun pm version <patch|minor|major>`を実行します。`package.json`と`jsr.json`の両方のバージョンが更新され、コミットと`v1.2.3`形式のタグが作成されます。新しいバージョンが`main`に入るとJSRのワークフローが公開し、`v*`形式のタグをプッシュするとnpmに公開されます。
 
 ## 免責事項
 

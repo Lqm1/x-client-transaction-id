@@ -1,2 +1,3 @@
-# dnt build output
-npm/
+node_modules/
+dist/
+*.tgz
