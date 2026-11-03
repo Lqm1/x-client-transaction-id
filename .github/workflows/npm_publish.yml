@@ -15,27 +15,27 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: denoland/setup-deno@v2
+      - uses: oven-sh/setup-bun@v2
         with:
-          deno-version: v2.x
+          bun-version-file: package.json
 
-      - name: Run tests
-        run: deno test -A
+      - run: bun install --frozen-lockfile
 
-      - name: Get tag version
-        if: startsWith(github.ref, 'refs/tags/')
-        id: get_tag_version
-        run: echo TAG_VERSION=${GITHUB_REF/refs\/tags\//} >> $GITHUB_OUTPUT
+      - name: Check the tag matches the package versions
+        run: |
+          test "$GITHUB_REF_NAME" = "$(jq -r .version package.json)"
+          test "$GITHUB_REF_NAME" = "$(jq -r .version jsr.json)"
 
+      - run: bun run typecheck
+
+      - run: bun test
+
+      # Trusted publishing needs npm 11.5.1+, which ships with Node.js 24
       - uses: actions/setup-node@v6
         with:
-          node-version: "24.x"
+          node-version: "24"
           registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
 
-      - name: npm build
-        run: deno run -A ./scripts/build_npm.ts
-          ${{steps.get_tag_version.outputs.TAG_VERSION}}
-
-      - name: npm publish
-        if: startsWith(github.ref, 'refs/tags/')
-        run: cd npm && npm publish
+      # prepack builds dist/ with Bun before the tarball is created
+      - run: npm publish

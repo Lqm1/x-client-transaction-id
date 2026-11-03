@@ -11,6 +11,7 @@
     "url": "https://github.com/Lqm1/x-client-transaction-id/issues"
   },
   "type": "module",
+  "packageManager": "bun@1.4.4",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/cjs/index.d.ts",
