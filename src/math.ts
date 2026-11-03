@@ -82,7 +82,8 @@ export function floatToHex(x: number): string {
 }
 
 /**
- * Determines if a number is odd and returns a specific value
+ * Maps a number's parity to the lower bound X's script uses when scaling
+ * easing curve control points: odd positions may go negative.
  *
  * @param num Number to check
  * @returns -1.0 if odd, 0.0 if even

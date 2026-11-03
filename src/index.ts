@@ -21,6 +21,7 @@ import { ClientTransaction } from "./transaction.ts";
 export { matrixNumbers } from "./animation.ts";
 export { decodeBase64, encodeBase64 } from "./base64.ts";
 export { Cubic } from "./cubic.ts";
+export type { ClientTransactionErrorOptions } from "./errors.ts";
 export {
   AnimationFrameDataError,
   ClientTransactionError,
