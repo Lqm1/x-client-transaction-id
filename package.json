@@ -1,6 +1,6 @@
 {
   "name": "x-client-transaction-id",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Client Transaction ID generator library for X (formerly Twitter) API requests",
   "license": "MIT",
   "repository": {
