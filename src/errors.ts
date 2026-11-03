@@ -12,6 +12,7 @@ export interface ClientTransactionErrorOptions {
 
 /** Base error class for all client transaction related errors. */
 export class ClientTransactionError extends Error {
+  /** Machine-readable error code, such as `ONDEMAND_FILE_FETCH_ERROR` */
   readonly code: string;
 
   /**
@@ -53,8 +54,11 @@ export class OnDemandFileUrlResolutionError extends ClientTransactionInitializat
 
 /** Error thrown when fetching the ondemand file fails. */
 export class OnDemandFileFetchError extends ClientTransactionInitializationError {
+  /** URL of the ondemand chunk that was requested */
   readonly url: string;
+  /** HTTP status code of the failed response */
   readonly status: number;
+  /** HTTP status text of the failed response */
   readonly statusText: string;
 
   /**
@@ -111,6 +115,7 @@ export class IndicesNotInitializedError extends ClientTransactionError {
 
 /** Error thrown when animation frame data cannot be built for a given row. */
 export class AnimationFrameDataError extends ClientTransactionInitializationError {
+  /** Frame row selected by the verification key */
   readonly rowIndex: number;
 
   /**
@@ -158,7 +163,9 @@ export class HandleXMigrationError extends ClientTransactionError {
 
 /** Error thrown when fetching the X homepage fails. */
 export class XHomePageFetchError extends HandleXMigrationError {
+  /** HTTP status code of the failed response */
   readonly status: number;
+  /** HTTP status text of the failed response */
   readonly statusText: string;
 
   /**
@@ -183,7 +190,9 @@ export class XHomePageFetchError extends HandleXMigrationError {
  *             thrown by the library.
  */
 export class XMigrationRedirectionError extends HandleXMigrationError {
+  /** HTTP status code of the failed response */
   readonly status: number;
+  /** HTTP status text of the failed response */
   readonly statusText: string;
 
   /**
@@ -209,7 +218,9 @@ export class XMigrationRedirectionError extends HandleXMigrationError {
  *             thrown by the library.
  */
 export class XMigrationFormError extends HandleXMigrationError {
+  /** HTTP status code of the failed response */
   readonly status: number;
+  /** HTTP status text of the failed response */
   readonly statusText: string;
 
   /**
@@ -228,7 +239,9 @@ export class XMigrationFormError extends HandleXMigrationError {
 
 /** Error thrown when interpolation inputs have mismatched lengths. */
 export class InterpolationInputError extends ClientTransactionError {
+  /** Length of the `fromList` array */
   readonly fromLength: number;
+  /** Length of the `toList` array */
   readonly toLength: number;
 
   /**

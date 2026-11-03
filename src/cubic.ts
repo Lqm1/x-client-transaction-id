@@ -81,14 +81,17 @@ export class Cubic {
     return this.sampleY(this.solveCurveX(time));
   }
 
+  /** x(t) of the curve */
   private sampleX(t: number): number {
     return ((this.ax * t + this.bx) * t + this.cx) * t;
   }
 
+  /** y(t) of the curve */
   private sampleY(t: number): number {
     return ((this.ay * t + this.by) * t + this.cy) * t;
   }
 
+  /** dx/dt of the curve at t */
   private sampleDerivativeX(t: number): number {
     return (3.0 * this.ax * t + 2.0 * this.bx) * t + this.cx;
   }
