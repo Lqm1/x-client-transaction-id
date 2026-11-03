@@ -16,7 +16,7 @@ import {
 } from "./errors.ts";
 import { interpolate } from "./interpolate.ts";
 import { convertRotationToMatrix } from "./rotation.ts";
-import { floatToHex, isOdd } from "./utils.ts";
+import { floatToHex, isOdd, matrixNumbers } from "./utils.ts";
 import { decodeBase64, encodeBase64 } from "@std/encoding";
 
 const ON_DEMAND_CHUNK_NAME = "ondemand.s";
@@ -295,8 +295,12 @@ class ClientTransaction {
 
     const cubic = new Cubic(curves);
     const val = cubic.getValue(targetTime);
+    // The browser clamps every colour channel to 0..255 when it
+    // serialises the computed colour. The eased value can overshoot
+    // [0, 1], so an unclamped channel can round above 255 and print as
+    // three hex digits ("125" instead of "ff"), which X rejects.
     const color = interpolate(fromColor, toColor, val).map((value) =>
-      value > 0 ? value : 0
+      Math.max(0, Math.min(255, value))
     );
     const rotation = interpolate(fromRotation, toRotation, val);
     const matrix = convertRotationToMatrix(rotation[0]);
@@ -306,17 +310,19 @@ class ClientTransaction {
       .slice(0, -1)
       .map((value) => Math.round(value).toString(16));
 
+    // X's script reads the matrix back from the computed style as
+    // printed text and applies Number(x.toFixed(2)) to each number it
+    // extracts, so reproduce that path instead of rounding the raw
+    // double: the printed form has six significant digits, and a value
+    // such as 0.695 rounds differently from Math.round(value * 100).
     for (const value of matrix) {
-      let rounded = Math.round(value * 100) / 100;
-      if (rounded < 0) {
-        rounded = -rounded;
+      for (const token of matrixNumbers(value)) {
+        const hexValue = floatToHex(Math.abs(Number(token.toFixed(2))))
+          .toLowerCase();
+        strArr.push(
+          hexValue.startsWith(".") ? `0${hexValue}` : hexValue || "0",
+        );
       }
-      const hexValue = floatToHex(rounded);
-      strArr.push(
-        hexValue.startsWith(".")
-          ? `0${hexValue}`.toLowerCase()
-          : hexValue || "0",
-      );
     }
 
     strArr.push("0", "0");

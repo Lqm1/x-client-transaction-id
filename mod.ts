@@ -35,6 +35,7 @@ import {
   floatToHex,
   handleXMigration,
   isOdd,
+  matrixNumbers,
 } from "./utils.ts";
 import { decodeBase64, encodeBase64 } from "@std/encoding";
 
@@ -61,6 +62,7 @@ export {
   InterpolationInputError,
   isOdd,
   KeyByteIndicesExtractionError,
+  matrixNumbers,
   OnDemandFileFetchError,
   OnDemandFileUrlResolutionError,
   SiteVerificationKeyNotFoundError,
