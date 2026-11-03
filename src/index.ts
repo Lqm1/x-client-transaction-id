@@ -16,11 +16,11 @@
  *
  * @module
  */
-import ClientTransaction from "./transaction.ts";
+import { ClientTransaction } from "./transaction.ts";
 
 export { matrixNumbers } from "./animation.ts";
 export { decodeBase64, encodeBase64 } from "./base64.ts";
-export { default as Cubic } from "./cubic.ts";
+export { Cubic } from "./cubic.ts";
 export {
   AnimationFrameDataError,
   ClientTransactionError,

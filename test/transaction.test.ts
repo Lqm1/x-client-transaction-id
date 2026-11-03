@@ -60,7 +60,7 @@ test("initialize throws a typed error when the verification key is missing", asy
   const document = createDocument(
     `<html><body><script>1:"ondemand.s",foo})[e]||e)+"."+({1:"abc123_"}</script></body></html>`,
   );
-  spyOn(globalThis, "fetch").mockResolvedValue(
+  const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
     new Response("(a[1], 16)(b[2], 16)", { status: 200 }),
   );
 
@@ -70,6 +70,7 @@ test("initialize throws a typed error when the verification key is missing", asy
   expect((error as Error).message).toContain(
     "twitter-site-verification meta tag",
   );
+  expect(fetchSpy).not.toHaveBeenCalled();
 });
 
 test("initialize surfaces ondemand fetch failures as typed errors", async () => {

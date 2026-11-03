@@ -91,7 +91,13 @@ class SiteVerificationKeyNotFoundError extends ClientTransactionInitializationEr
   }
 }
 
-/** Error thrown when indices are accessed before initialization. */
+/**
+ * Error thrown when indices are accessed before initialization.
+ *
+ * @deprecated The animation key is now computed only once the indices are
+ *             known, so this error is no longer thrown. It is retained for
+ *             backward compatibility.
+ */
 class IndicesNotInitializedError extends ClientTransactionError {
   constructor() {
     super(

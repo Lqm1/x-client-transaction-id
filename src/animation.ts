@@ -1,6 +1,103 @@
 /**
- * Reproduction of how the browser presents X's loading animation.
+ * Derivation of the animation key: the colour and transform of X's
+ * loading animation at a point in time chosen by the verification key, as
+ * X's script reads them back from the browser.
  */
+import { Cubic } from "./cubic.ts";
+import { AnimationFrameDataError } from "./errors.ts";
+import {
+  convertRotationToMatrix,
+  floatToHex,
+  interpolate,
+  interpolateNum,
+  isOdd,
+} from "./math.ts";
+
+// Length of the timeline the frame time is a point on
+const TOTAL_TIME = 4096;
+
+/** Positions of the verification key bytes that parameterise the animation. */
+export interface KeyByteIndices {
+  /** Index of the key byte that selects the frame row */
+  rowIndex: number;
+  /** Indices of the key bytes whose product sets the frame time */
+  keyBytesIndices: number[];
+}
+
+/**
+ * Computes the animation key for a verification key.
+ * @param keyBytes Decoded verification key
+ * @param indices Key byte indices from the ondemand.s chunk
+ * @param frameRows Frame rows of the animation the key selects
+ * @throws {AnimationFrameDataError} If the selected frame row is missing.
+ */
+export function getAnimationKey(
+  keyBytes: number[],
+  indices: KeyByteIndices,
+  frameRows: number[][],
+): string {
+  const rowIndex = keyBytes[indices.rowIndex] % 16;
+  const frameRow = frameRows[rowIndex];
+  if (!frameRow) {
+    throw new AnimationFrameDataError(rowIndex);
+  }
+
+  const frameTime = indices.keyBytesIndices.reduce(
+    (time, index) => time * (keyBytes[index] % 16),
+    1,
+  );
+  return animate(frameRow, (Math.round(frameTime / 10) * 10) / TOTAL_TIME);
+}
+
+/**
+ * Evaluates a frame row's animation at `targetTime` and serialises the
+ * colour and rotation matrix the way X's script does.
+ * @param frameRow Start colour (3), end colour (3), rotation, then the
+ *                 easing curve's control points
+ * @param targetTime Normalised time to evaluate the animation at
+ */
+function animate(frameRow: number[], targetTime: number): string {
+  const fromColor = frameRow.slice(0, 3);
+  const toColor = frameRow.slice(3, 6);
+  const toRotation = solve(frameRow[6], 60, 360, true);
+  const curves = frameRow
+    .slice(7)
+    .map((value, index) => solve(value, isOdd(index), 1, false));
+  const progress = new Cubic(curves).getValue(targetTime);
+
+  // The eased value can overshoot [0, 1]; the browser clamps colour
+  // channels to 0..255, otherwise e.g. 293 prints as "125" not "ff"
+  const color = interpolate(fromColor, toColor, progress).map((channel) =>
+    Math.round(Math.max(0, Math.min(255, channel))).toString(16),
+  );
+
+  // X's script reads the matrix from its printed form (six significant
+  // digits) and applies Number(x.toFixed(2)) to each extracted number
+  const rotation = interpolateNum(0, toRotation, progress);
+  const matrix = convertRotationToMatrix(rotation)
+    .flatMap((value) => matrixNumbers(value))
+    .map((number) => {
+      const hex = floatToHex(Math.abs(Number(number.toFixed(2)))).toLowerCase();
+      return hex.startsWith(".") ? `0${hex}` : hex || "0";
+    });
+
+  return [...color, ...matrix, "0", "0"].join("").replace(/[.-]/g, "");
+}
+
+/**
+ * Scales a byte (0-255) linearly into [minVal, maxVal].
+ * @param rounding Floor the result when true, round it to two decimals
+ *                 otherwise
+ */
+function solve(
+  value: number,
+  minVal: number,
+  maxVal: number,
+  rounding: boolean,
+): number {
+  const result = (value * (maxVal - minVal)) / 255 + minVal;
+  return rounding ? Math.floor(result) : Math.round(result * 100) / 100;
+}
 
 /**
  * Formats a number the way Chromium prints a computed CSS transform

@@ -12,7 +12,7 @@
  * 1e-7. Plain bisection to 1e-5 returns a different t for a small
  * fraction of curves and moves a printed digit of the animation key.
  */
-class Cubic {
+export class Cubic {
   private static readonly EPSILON = 1e-7;
   private static readonly NEWTON_ITERATIONS = 4;
   private static readonly SPLINE_SAMPLES = 11;
@@ -156,5 +156,3 @@ class Cubic {
     return t2;
   }
 }
-
-export default Cubic;
