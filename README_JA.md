@@ -166,7 +166,7 @@ bun run typecheck
 bun run build      # npmパッケージをdist/にビルド
 ```
 
-リリースするには`bun pm version <patch|minor|major>`を実行します。`package.json`と`jsr.json`の両方のバージョンが更新され、コミットとタグが作成されます。新しいバージョンが`main`に入るとJSRのワークフローが公開し、タグをプッシュするとnpmに公開されます。
+リリースするには`bun pm version <patch|minor|major>`を実行します。`package.json`と`jsr.json`の両方のバージョンが更新され、コミットと`v1.2.3`形式のタグが作成されます。新しいバージョンが`main`に入るとJSRのワークフローが公開し、`v*`形式のタグをプッシュするとnpmに公開されます。
 
 ## 免責事項
 

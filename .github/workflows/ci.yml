@@ -13,22 +13,15 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-
+      - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: package.json
-
       - run: bun install --frozen-lockfile
-
       - run: bun run lint
-
       - run: bun run typecheck
-
       # The live X API test runs before npm releases only
       - run: bun run test:unit
-
       # Packs the npm tarball (prepack builds it) and checks its types
       - run: bun run check:package
-
-      - run: npx jsr publish --dry-run
+      - run: bunx jsr publish --dry-run

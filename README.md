@@ -173,9 +173,9 @@ bun run build      # builds the npm package into dist/
 ```
 
 To release, run `bun pm version <patch|minor|major>`. It bumps the version in
-both `package.json` and `jsr.json`, then commits and tags the change. The JSR
-workflow publishes each new version that reaches `main`, and pushing the tag
-publishes it to npm.
+both `package.json` and `jsr.json`, then commits the change and tags it as
+`v1.2.3`. The JSR workflow publishes each new version that reaches `main`, and
+pushing a `v*` tag publishes it to npm.
 
 ## Disclaimer
 

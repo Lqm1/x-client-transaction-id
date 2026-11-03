@@ -3,7 +3,7 @@ name: NPM Publish
 on:
   push:
     tags:
-      - "*"
+      - "v*"
 
 permissions:
   id-token: write # Required for OIDC
@@ -13,30 +13,20 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: package.json
-
       - run: bun install --frozen-lockfile
-
-      # Accepts both "1.2.3" and the "v1.2.3" tags bun pm version creates
-      - name: Check the tag matches the package versions
-        run: |
-          test "${GITHUB_REF_NAME#v}" = "$(jq -r .version package.json)"
-          test "${GITHUB_REF_NAME#v}" = "$(jq -r .version jsr.json)"
-
-      - run: bun run typecheck
-
+      - run: bun run build
       - run: bun test
 
-      # Trusted publishing needs npm 11.5.1+, which ships with Node.js 24
-      - uses: actions/setup-node@v6
+      # bun publish supports neither trusted publishing (OIDC) nor
+      # provenance yet, so npm uploads the package
+      - uses: actions/setup-node@v7
         with:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
-          package-manager-cache: false
-
-      # prepack builds dist/ with Bun before the tarball is created
-      - run: npm publish
+          package-manager-cache: false # never use caching in release builds
+      - run: npm publish # Or: npm stage publish

@@ -159,7 +159,7 @@ bun run typecheck
 bun run build      # 将npm包构建到dist/
 ```
 
-发布时运行`bun pm version <patch|minor|major>`。它会同时更新`package.json`和`jsr.json`中的版本，并创建提交和标签。新版本进入`main`后，JSR工作流会发布它；推送标签后会发布到npm。
+发布时运行`bun pm version <patch|minor|major>`。它会同时更新`package.json`和`jsr.json`中的版本，并创建提交和`v1.2.3`格式的标签。新版本进入`main`后，JSR工作流会发布它；推送`v*`格式的标签后会发布到npm。
 
 ## 免责声明
 
