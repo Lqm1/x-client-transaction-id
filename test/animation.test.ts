@@ -9,10 +9,18 @@
  * are rounded from their printed form the way X's script reads them.
  */
 import { expect, test } from "bun:test";
-import { parseHTML } from "linkedom";
 import { getAnimationKey, matrixNumbers } from "../src/animation.ts";
 import { decodeBase64 } from "../src/base64.ts";
+import { AnimationFrameDataError } from "../src/errors.ts";
 import { getAnimationFrameRows } from "../src/home-page.ts";
+import {
+  LIVE_PAGE_ANIMATION_KEY,
+  LIVE_PAGE_KEY,
+  loadLivePage,
+} from "./fixture.ts";
+
+// The indices the captured ondemand.s chunk carries
+const INDICES = { rowIndex: 14, keyBytesIndices: [20, 19, 30] };
 
 // A 48-byte verification key whose animation drives a colour channel
 // to 293 before the browser's clamp (frame row and indices from the
@@ -25,22 +33,25 @@ const OVERFLOW_KEY =
 const OVERFLOW_ANIMATION_KEY =
   "ffe600a8f5c28f5c28f80c28f5c28f5c290c28f5c28f5c290a8f5c28f5c28f800";
 
-test("animation key clamps colour channels to 0..255 like the browser", async () => {
-  const html = await Bun.file(
-    new URL("./fixtures/live_page.html", import.meta.url),
-  ).text();
-  const document = parseHTML(html).window.document;
-  const keyBytes = Array.from(decodeBase64(OVERFLOW_KEY));
-  // The indices the captured ondemand file carries
-  const indices = { rowIndex: 14, keyBytesIndices: [20, 19, 30] };
+async function animationKeyFor(key: string): Promise<string> {
+  const keyBytes = Array.from(decodeBase64(key));
+  const frameRows = getAnimationFrameRows(await loadLivePage(), keyBytes);
+  return getAnimationKey(keyBytes, INDICES, frameRows);
+}
 
-  expect(
-    getAnimationKey(
-      keyBytes,
-      indices,
-      getAnimationFrameRows(document, keyBytes),
-    ),
-  ).toBe(OVERFLOW_ANIMATION_KEY);
+test("animation key of the captured page matches the reference", async () => {
+  expect(await animationKeyFor(LIVE_PAGE_KEY)).toBe(LIVE_PAGE_ANIMATION_KEY);
+});
+
+test("animation key clamps colour channels to 0..255 like the browser", async () => {
+  expect(await animationKeyFor(OVERFLOW_KEY)).toBe(OVERFLOW_ANIMATION_KEY);
+});
+
+test("animation key requires the selected frame row", () => {
+  const keyBytes = Array<number>(32).fill(0);
+  expect(() => getAnimationKey(keyBytes, INDICES, [])).toThrow(
+    AnimationFrameDataError,
+  );
 });
 
 test("matrixNumbers reads the numbers X's script reads from a matrix entry", () => {

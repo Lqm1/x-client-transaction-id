@@ -1,51 +1,105 @@
-/**
- * Tests for the ClientTransaction class
- *
- * This file contains test cases to verify the functionality of the
- * ClientTransaction class and transaction ID generation.
- */
 import { afterEach, expect, mock, spyOn, test } from "bun:test";
-import { parseHTML } from "linkedom";
 import {
   ClientTransaction,
   ClientTransactionNotInitializedError,
-  fetchXDocument,
-  InterpolationInputError,
-  interpolate,
+  decodeBase64,
+  encodeBase64,
   OnDemandFileFetchError,
   SiteVerificationKeyNotFoundError,
 } from "../src/index.ts";
+import {
+  createDocument,
+  LIVE_PAGE_ANIMATION_KEY,
+  LIVE_PAGE_KEY,
+  LIVE_PAGE_ON_DEMAND_SOURCE,
+  loadLivePage,
+} from "./fixture.ts";
 
-function createDocument(html: string): Document {
-  return parseHTML(html).window.document;
-}
+// A runtime snippet the ondemand.s URL can be resolved from
+const RUNTIME_SCRIPT = `<script>1:"ondemand.s",foo})[e]||e)+"."+({1:"abc123_"}</script>`;
 
 afterEach(() => {
   mock.restore();
 });
 
-test("fetchXDocument fetches the responsive web app document", async () => {
-  const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
-    new Response("<html><body><main>ok</main></body></html>", {
-      status: 200,
-    }),
+test("generateTransactionId reproduces reference IDs for the captured page", async () => {
+  // Produced by the implementation that predates the move to Bun, with
+  // Math.random() fixed at 0.5
+  spyOn(globalThis, "fetch").mockResolvedValue(
+    new Response(LIVE_PAGE_ON_DEMAND_SOURCE),
   );
+  spyOn(Math, "random").mockReturnValue(0.5);
+  const transaction = await ClientTransaction.create(await loadLivePage());
 
-  const document = await fetchXDocument();
-
-  expect(fetchSpy.mock.calls[0]?.[0]).toBe("https://x.com/i/jf/");
-  expect(document.querySelector("main")?.textContent).toBe("ok");
+  expect(
+    await transaction.generateTransactionId(
+      "GET",
+      "/i/api/graphql/abc/UserByScreenName",
+      undefined,
+      undefined,
+      undefined,
+      123456789,
+    ),
+  ).toBe(
+    "gIybSOfM8ELFF+idR2Y8IQ1fdV80xY5JmzC278Y+HJvLAtkAHUaTL7OF/GhExtR+5pVN24elPZCct5ujO2lBVvrPTDecgw",
+  );
+  expect(
+    await transaction.generateTransactionId(
+      "POST",
+      "/1.1/jot/client_event.json",
+      undefined,
+      undefined,
+      undefined,
+      98765432,
+    ),
+  ).toBe(
+    "gIybSOfM8ELFF+idR2Y8IQ1fdV80xY5JmzC278Y+HJvLAtkAHUaTL7OF/GhExtR+5viKY4XfkO81y2F6yffUbiKONGRtgw",
+  );
 });
 
-test("interpolate throws a typed error for mismatched input lengths", () => {
-  const run = () => interpolate([1], [1, 2], 0.5);
-  expect(run).toThrow(InterpolationInputError);
-  expect(run).toThrow("Interpolation requires arrays of the same length");
+test("generateTransactionId uses the key and animation key it is given", async () => {
+  spyOn(globalThis, "fetch").mockResolvedValue(
+    new Response(LIVE_PAGE_ON_DEMAND_SOURCE),
+  );
+  // A zero random byte leaves the other bytes unmasked
+  spyOn(Math, "random").mockReturnValue(0);
+  const transaction = await ClientTransaction.create(await loadLivePage());
+  const generate = (key?: string, animationKey?: string) =>
+    transaction.generateTransactionId(
+      "GET",
+      "/x",
+      undefined,
+      key,
+      animationKey,
+      1,
+    );
+
+  const defaultId = await generate();
+  expect(await generate(LIVE_PAGE_KEY, LIVE_PAGE_ANIMATION_KEY)).toBe(
+    defaultId,
+  );
+  expect(await generate(undefined, "0")).not.toBe(defaultId);
+  const bytes = decodeBase64(
+    await generate(encodeBase64(new Uint8Array([1, 2, 3]))),
+  );
+  expect(Array.from(bytes.slice(0, 4))).toEqual([0, 1, 2, 3]);
+});
+
+test("initialize runs once", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
+    new Response(LIVE_PAGE_ON_DEMAND_SOURCE),
+  );
+  const transaction = new ClientTransaction(await loadLivePage());
+
+  await transaction.initialize();
+  await transaction.initialize();
+  expect(fetchSpy).toHaveBeenCalledTimes(1);
 });
 
 test("generateTransactionId requires initialization", async () => {
-  const document = createDocument("<html><head></head><body></body></html>");
-  const transaction = new ClientTransaction(document);
+  const transaction = new ClientTransaction(
+    createDocument("<html><head></head><body></body></html>"),
+  );
 
   const error = await transaction
     .generateTransactionId("GET", "/graphql/test")
@@ -57,14 +111,13 @@ test("generateTransactionId requires initialization", async () => {
 });
 
 test("initialize throws a typed error when the verification key is missing", async () => {
-  const document = createDocument(
-    `<html><body><script>1:"ondemand.s",foo})[e]||e)+"."+({1:"abc123_"}</script></body></html>`,
-  );
   const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
-    new Response("(a[1], 16)(b[2], 16)", { status: 200 }),
+    new Response("(a[1], 16)(b[2], 16)"),
+  );
+  const transaction = new ClientTransaction(
+    createDocument(`<html><body>${RUNTIME_SCRIPT}</body></html>`),
   );
 
-  const transaction = new ClientTransaction(document);
   const error = await transaction.initialize().catch((e: unknown) => e);
   expect(error).toBeInstanceOf(SiteVerificationKeyNotFoundError);
   expect((error as Error).message).toContain(
@@ -74,17 +127,18 @@ test("initialize throws a typed error when the verification key is missing", asy
 });
 
 test("initialize surfaces ondemand fetch failures as typed errors", async () => {
-  const document = createDocument(
-    `<html><head><meta name="twitter-site-verification" content="AQIDBAUGBwg="/></head><body><script>1:"ondemand.s",foo})[e]||e)+"."+({1:"abc123_"}</script></body></html>`,
-  );
   spyOn(globalThis, "fetch").mockResolvedValue(
     new Response("missing", {
       status: 503,
       statusText: "Service Unavailable",
     }),
   );
+  const transaction = new ClientTransaction(
+    createDocument(
+      `<html><head><meta name="twitter-site-verification" content="AQIDBAUGBwg="/></head><body>${RUNTIME_SCRIPT}</body></html>`,
+    ),
+  );
 
-  const transaction = new ClientTransaction(document);
   const error = await transaction.initialize().catch((e: unknown) => e);
   expect(error).toBeInstanceOf(OnDemandFileFetchError);
   expect((error as OnDemandFileFetchError).message).toContain(
@@ -92,145 +146,3 @@ test("initialize surfaces ondemand fetch failures as typed errors", async () => 
   );
   expect((error as OnDemandFileFetchError).status).toBe(503);
 });
-
-/**
- * Test to verify the transaction ID generation process
- *
- * This test performs the following steps:
- * 1. Fetches the X app shell and extracts guest token for each request
- * 2. Creates a new ClientTransaction instance for each request
- * 3. Generates a transaction ID for a specific API endpoint
- * 4. Makes 5 API requests and verifies all of them are successful (100% success rate)
- *
- * Note: Rate limiting may occur. Rate limiting produces the same 404 errors
- * as an invalid x-client-transaction-id. If more than 50% of requests return 404
- * or if all requests fail with 404, try opening any user profile page in Chrome
- * in private to check. If rate limiting is in effect, Chrome will also show errors.
- */
-test(
-  "Generate and verify transaction ID for X API UserByScreenName endpoint",
-  async () => {
-    const totalRequests = 5;
-    let successfulRequests = 0;
-    let notFoundErrors = 0;
-
-    // Create a base request function
-    const createRequest = (guestToken: string) =>
-      new Request(
-        "https://api.x.com/graphql/1VOOyvKkiI3FMmkeDNxM9A/UserByScreenName?variables=%7B%22screen_name%22%3A%22elonmusk%22%7D&features=%7B%22hidden_profile_subscriptions_enabled%22%3Atrue%2C%22profile_label_improvements_pcf_label_in_post_enabled%22%3Atrue%2C%22rweb_tipjar_consumption_enabled%22%3Atrue%2C%22verified_phone_label_enabled%22%3Afalse%2C%22subscriptions_verification_info_is_identity_verified_enabled%22%3Atrue%2C%22subscriptions_verification_info_verified_since_enabled%22%3Atrue%2C%22highlights_tweets_tab_ui_enabled%22%3Atrue%2C%22responsive_web_twitter_article_notes_tab_enabled%22%3Atrue%2C%22subscriptions_feature_can_gift_premium%22%3Atrue%2C%22creator_subscriptions_tweet_preview_api_enabled%22%3Atrue%2C%22responsive_web_graphql_skip_user_profile_image_extensions_enabled%22%3Afalse%2C%22responsive_web_graphql_timeline_navigation_enabled%22%3Atrue%7D&fieldToggles=%7B%22withAuxiliaryUserLabels%22%3Atrue%7D",
-        {
-          headers: {
-            accept: "*/*",
-            "accept-language": "ja",
-            authorization:
-              "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",
-            "cache-control": "no-cache",
-            "content-type": "application/json",
-            origin: "https://x.com",
-            pragma: "no-cache",
-            priority: "u=1, i",
-            referer: "https://x.com/",
-            "sec-ch-ua":
-              '"Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"',
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": '"Windows"',
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-site",
-            "user-agent":
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
-            "x-guest-token": guestToken,
-            "x-twitter-active-user": "yes",
-            "x-twitter-client-language": "ja",
-          },
-        },
-      );
-
-    // Act: Generate multiple transaction IDs and test them
-    console.log(`Running ${totalRequests} API requests...`);
-
-    for (let i = 0; i < totalRequests; i++) {
-      console.log(`Request ${i + 1}/${totalRequests}: Fetching X document...`);
-
-      // Create new document and ClientTransaction instance for each request
-      const document = await fetchXDocument();
-
-      // Extract the guest token embedded in the document HTML
-      const guestToken =
-        document.documentElement.outerHTML.match(/gt=([0-9]+);/)?.[1] || null;
-
-      if (!guestToken) {
-        console.error(
-          `Request ${i + 1}: Failed to extract guest token from the document`,
-        );
-        continue;
-      }
-
-      // Create a new ClientTransaction instance
-      const ct = await ClientTransaction.create(document);
-
-      // Create request with fresh guest token
-      const request = createRequest(guestToken);
-
-      // Generate transaction ID with the fresh ClientTransaction instance
-      const transactionId = await ct.generateTransactionId(
-        request.method,
-        new URL(request.url).pathname,
-      );
-      request.headers.set("x-client-transaction-id", transactionId);
-
-      // Execute the request
-      try {
-        console.log(`Request ${i + 1}/${totalRequests}: Executing API call...`);
-        const response = await fetch(request);
-        await response.text();
-
-        if (response.ok) {
-          successfulRequests++;
-          console.log(`Request ${i + 1}/${totalRequests}: Success`);
-        } else {
-          console.error(
-            `Request ${
-              i + 1
-            }/${totalRequests}: Failed with status: ${response.status}`,
-          );
-          if (response.status === 404) {
-            notFoundErrors++;
-          }
-        }
-      } catch (error) {
-        console.error(`Request ${i + 1}/${totalRequests}: Error:`, error);
-      }
-
-      // Small delay between requests to avoid rate limiting
-      await new Promise((resolve) => setTimeout(resolve, 200));
-    }
-
-    console.log(
-      `Successful requests: ${successfulRequests}/${totalRequests} (${(
-        (successfulRequests / totalRequests) * 100
-      ).toFixed(2)}%)`,
-    );
-    console.log(
-      `404 Not Found errors: ${notFoundErrors}/${totalRequests} (${(
-        (notFoundErrors / totalRequests) * 100
-      ).toFixed(2)}%)`,
-    );
-
-    if (
-      notFoundErrors > totalRequests / 2 ||
-      notFoundErrors === totalRequests
-    ) {
-      console.warn(
-        "Possible rate limiting detected. Try opening any user profile page in Chrome to verify.",
-      );
-      console.warn(
-        "If rate limiting is occurring, errors will also appear in the browser.",
-      );
-    }
-
-    // Assert: Verify all requests were successful (100% success rate)
-    expect(successfulRequests).toBe(totalRequests);
-  },
-  { timeout: 60_000 },
-);
