@@ -10,7 +10,7 @@
  */
 import { assertEquals } from "@std/assert";
 import { parseHTML } from "linkedom";
-import { ClientTransaction, matrixNumbers } from "./mod.ts";
+import { ClientTransaction, matrixNumbers } from "../src/index.ts";
 import { decodeBase64 } from "@std/encoding";
 
 // A 48-byte verification key whose animation drives a colour channel
@@ -26,7 +26,7 @@ const OVERFLOW_ANIMATION_KEY =
 
 Deno.test("animation key clamps colour channels to 0..255 like the browser", async () => {
   const fixture = await Deno.readTextFile(
-    new URL("./testdata/live_page.html", import.meta.url),
+    new URL("./fixtures/live_page.html", import.meta.url),
   );
   const html = fixture.replace(
     /(<meta name="twitter-site-verification" content=")[^"]*(")/,

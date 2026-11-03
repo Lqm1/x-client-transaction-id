@@ -8,7 +8,7 @@ await build({
     lib: ["ESNext", "DOM"],
   },
   importMap: "deno.json",
-  entryPoints: ["./mod.ts"],
+  entryPoints: ["./src/index.ts"],
   outDir: "./npm",
   shims: {
     // see JS docs for overview and more options

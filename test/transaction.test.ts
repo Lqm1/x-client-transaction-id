@@ -14,7 +14,7 @@ import {
   InterpolationInputError,
   OnDemandFileFetchError,
   SiteVerificationKeyNotFoundError,
-} from "./mod.ts";
+} from "../src/index.ts";
 
 function createDocument(html: string): Document {
   return parseHTML(html).window.document;
