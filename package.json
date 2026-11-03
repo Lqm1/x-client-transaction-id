@@ -41,7 +41,7 @@
     "prepack": "bun run build",
     "test": "bun test",
     "test:unit": "bun test --path-ignore-patterns='**/live.test.ts'",
-    "typecheck": "tsc",
+    "typecheck": "bun check",
     "version": "bun scripts/sync-jsr-version.ts && git add jsr.json"
   },
   "dependencies": {
