@@ -21,10 +21,11 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
+      # Accepts both "1.2.3" and the "v1.2.3" tags bun pm version creates
       - name: Check the tag matches the package versions
         run: |
-          test "$GITHUB_REF_NAME" = "$(jq -r .version package.json)"
-          test "$GITHUB_REF_NAME" = "$(jq -r .version jsr.json)"
+          test "${GITHUB_REF_NAME#v}" = "$(jq -r .version package.json)"
+          test "${GITHUB_REF_NAME#v}" = "$(jq -r .version jsr.json)"
 
       - run: bun run typecheck
 

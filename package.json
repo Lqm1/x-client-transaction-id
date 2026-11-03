@@ -41,7 +41,8 @@
     "prepack": "bun run build",
     "test": "bun test",
     "test:unit": "bun test --path-ignore-patterns='**/live.test.ts'",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "version": "bun scripts/sync-jsr-version.ts && git add jsr.json"
   },
   "dependencies": {
     "linkedom": "^0.18.15"
