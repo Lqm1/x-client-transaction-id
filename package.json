@@ -1,0 +1,25 @@
+{
+  "name": "x-client-transaction-id",
+  "version": "0.3.2",
+  "description": "Client Transaction ID generator library for X (formerly Twitter) API requests",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lqm1/x-client-transaction-id.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Lqm1/x-client-transaction-id/issues"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "linkedom": "^0.18.15"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "typescript": "^7.0.2"
+  }
+}

@@ -4,7 +4,7 @@
  * This file contains test cases to verify the functionality of the
  * ClientTransaction class and transaction ID generation.
  */
-import { assertEquals, assertRejects, assertThrows } from "@std/assert";
+import { afterEach, expect, mock, spyOn, test } from "bun:test";
 import { parseHTML } from "linkedom";
 import {
   ClientTransaction,
@@ -20,135 +20,78 @@ function createDocument(html: string): Document {
   return parseHTML(html).window.document;
 }
 
-Deno.test("fetchXDocument fetches the responsive web app document", async () => {
-  const originalFetch = globalThis.fetch;
-  const requestedUrls: string[] = [];
-
-  Object.defineProperty(globalThis, "fetch", {
-    configurable: true,
-    writable: true,
-    value: (input: RequestInfo | URL) => {
-      let url: string;
-      if (typeof input === "string") {
-        url = input;
-      } else if (input instanceof URL) {
-        url = input.toString();
-      } else {
-        url = input.url;
-      }
-      requestedUrls.push(url);
-
-      return Promise.resolve(
-        new Response("<html><body><main>ok</main></body></html>", {
-          status: 200,
-        }),
-      );
-    },
-  });
-
-  try {
-    const document = await fetchXDocument();
-
-    assertEquals(requestedUrls[0], "https://x.com/i/jf/");
-    assertEquals(document.querySelector("main")?.textContent, "ok");
-  } finally {
-    Object.defineProperty(globalThis, "fetch", {
-      configurable: true,
-      writable: true,
-      value: originalFetch,
-    });
-  }
+afterEach(() => {
+  mock.restore();
 });
 
-Deno.test("interpolate throws a typed error for mismatched input lengths", () => {
-  assertThrows(
-    () => {
-      interpolate([1], [1, 2], 0.5);
-    },
-    InterpolationInputError,
-    "Interpolation requires arrays of the same length",
+test("fetchXDocument fetches the responsive web app document", async () => {
+  const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
+    new Response("<html><body><main>ok</main></body></html>", {
+      status: 200,
+    }),
   );
+
+  const document = await fetchXDocument();
+
+  expect(fetchSpy.mock.calls[0]?.[0]).toBe("https://x.com/i/jf/");
+  expect(document.querySelector("main")?.textContent).toBe("ok");
 });
 
-Deno.test("generateTransactionId requires initialization", async () => {
+test("interpolate throws a typed error for mismatched input lengths", () => {
+  const run = () => interpolate([1], [1, 2], 0.5);
+  expect(run).toThrow(InterpolationInputError);
+  expect(run).toThrow("Interpolation requires arrays of the same length");
+});
+
+test("generateTransactionId requires initialization", async () => {
   const document = createDocument(
     "<html><head></head><body></body></html>",
   );
   const transaction = new ClientTransaction(document);
 
-  await assertRejects(
-    () => transaction.generateTransactionId("GET", "/graphql/test"),
-    ClientTransactionNotInitializedError,
+  const error = await transaction
+    .generateTransactionId("GET", "/graphql/test")
+    .catch((e: unknown) => e);
+  expect(error).toBeInstanceOf(ClientTransactionNotInitializedError);
+  expect((error as Error).message).toContain(
     "ClientTransaction has not been initialized",
   );
 });
 
-Deno.test("initialize throws a typed error when the verification key is missing", async () => {
+test("initialize throws a typed error when the verification key is missing", async () => {
   const document = createDocument(
     `<html><body><script>1:"ondemand.s",foo})[e]||e)+"."+({1:"abc123_"}</script></body></html>`,
   );
-  const originalFetch = globalThis.fetch;
+  spyOn(globalThis, "fetch").mockResolvedValue(
+    new Response("(a[1], 16)(b[2], 16)", { status: 200 }),
+  );
 
-  Object.defineProperty(globalThis, "fetch", {
-    configurable: true,
-    writable: true,
-    value: () =>
-      Promise.resolve(
-        new Response("(a[1], 16)(b[2], 16)", {
-          status: 200,
-        }),
-      ),
-  });
-
-  try {
-    const transaction = new ClientTransaction(document);
-    await assertRejects(
-      () => transaction.initialize(),
-      SiteVerificationKeyNotFoundError,
-      "twitter-site-verification meta tag",
-    );
-  } finally {
-    Object.defineProperty(globalThis, "fetch", {
-      configurable: true,
-      writable: true,
-      value: originalFetch,
-    });
-  }
+  const transaction = new ClientTransaction(document);
+  const error = await transaction.initialize().catch((e: unknown) => e);
+  expect(error).toBeInstanceOf(SiteVerificationKeyNotFoundError);
+  expect((error as Error).message).toContain(
+    "twitter-site-verification meta tag",
+  );
 });
 
-Deno.test("initialize surfaces ondemand fetch failures as typed errors", async () => {
+test("initialize surfaces ondemand fetch failures as typed errors", async () => {
   const document = createDocument(
     `<html><head><meta name="twitter-site-verification" content="AQIDBAUGBwg="/></head><body><script>1:"ondemand.s",foo})[e]||e)+"."+({1:"abc123_"}</script></body></html>`,
   );
-  const originalFetch = globalThis.fetch;
+  spyOn(globalThis, "fetch").mockResolvedValue(
+    new Response("missing", {
+      status: 503,
+      statusText: "Service Unavailable",
+    }),
+  );
 
-  Object.defineProperty(globalThis, "fetch", {
-    configurable: true,
-    writable: true,
-    value: () =>
-      Promise.resolve(
-        new Response("missing", {
-          status: 503,
-          statusText: "Service Unavailable",
-        }),
-      ),
-  });
-
-  try {
-    const transaction = new ClientTransaction(document);
-    const error = await assertRejects(
-      () => transaction.initialize(),
-      OnDemandFileFetchError,
-      "Unable to fetch the X ondemand chunk",
-    );
-    assertEquals(error.status, 503);
-  } finally {
-    Object.defineProperty(globalThis, "fetch", {
-      configurable: true,
-      writable: true,
-      value: originalFetch,
-    });
-  }
+  const transaction = new ClientTransaction(document);
+  const error = await transaction.initialize().catch((e: unknown) => e);
+  expect(error).toBeInstanceOf(OnDemandFileFetchError);
+  expect((error as OnDemandFileFetchError).message).toContain(
+    "Unable to fetch the X ondemand chunk",
+  );
+  expect((error as OnDemandFileFetchError).status).toBe(503);
 });
 
 /**
@@ -165,7 +108,7 @@ Deno.test("initialize surfaces ondemand fetch failures as typed errors", async (
  * or if all requests fail with 404, try opening any user profile page in Chrome
  * in private to check. If rate limiting is in effect, Chrome will also show errors.
  */
-Deno.test(
+test(
   "Generate and verify transaction ID for X API UserByScreenName endpoint",
   async () => {
     const totalRequests = 5;
@@ -294,10 +237,7 @@ Deno.test(
     }
 
     // Assert: Verify all requests were successful (100% success rate)
-    assertEquals(
-      successfulRequests,
-      totalRequests,
-      `All ${totalRequests} requests must succeed. Only ${successfulRequests} succeeded.`,
-    );
+    expect(successfulRequests).toBe(totalRequests);
   },
+  { timeout: 60_000 },
 );

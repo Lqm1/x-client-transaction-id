@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
 import { decodeBase64, encodeBase64 } from "../src/index.ts";
 
 // RFC 4648 section 10 test vectors
@@ -12,25 +12,25 @@ const vectors: [string, string][] = [
   ["foobar", "Zm9vYmFy"],
 ];
 
-Deno.test("encodeBase64 matches the RFC 4648 test vectors", () => {
+test("encodeBase64 matches the RFC 4648 test vectors", () => {
   for (const [input, expected] of vectors) {
-    assertEquals(encodeBase64(input), expected);
-    assertEquals(encodeBase64(new TextEncoder().encode(input)), expected);
+    expect(encodeBase64(input)).toBe(expected);
+    expect(encodeBase64(new TextEncoder().encode(input))).toBe(expected);
   }
 });
 
-Deno.test("decodeBase64 matches the RFC 4648 test vectors", () => {
+test("decodeBase64 matches the RFC 4648 test vectors", () => {
   for (const [expected, input] of vectors) {
-    assertEquals(decodeBase64(input), new TextEncoder().encode(expected));
+    expect(decodeBase64(input)).toEqual(new TextEncoder().encode(expected));
   }
 });
 
-Deno.test("base64 round-trips every byte value", () => {
+test("base64 round-trips every byte value", () => {
   const bytes = Uint8Array.from({ length: 256 }, (_, i) => i);
-  assertEquals(decodeBase64(encodeBase64(bytes)), bytes);
-  assertEquals(encodeBase64(bytes.buffer), encodeBase64(bytes));
+  expect(decodeBase64(encodeBase64(bytes))).toEqual(bytes);
+  expect(encodeBase64(bytes.buffer)).toBe(encodeBase64(bytes));
 });
 
-Deno.test("encodeBase64 encodes strings as UTF-8", () => {
-  assertEquals(encodeBase64("日本"), "5pel5pys");
+test("encodeBase64 encodes strings as UTF-8", () => {
+  expect(encodeBase64("日本")).toBe("5pel5pys");
 });

@@ -8,7 +8,7 @@
  * the easing is solved the way Chromium solves it, and matrix entries
  * are rounded from their printed form the way X's script reads them.
  */
-import { assertEquals } from "@std/assert";
+import { afterEach, expect, mock, spyOn, test } from "bun:test";
 import { parseHTML } from "linkedom";
 import { ClientTransaction, matrixNumbers } from "../src/index.ts";
 import { decodeBase64 } from "../src/base64.ts";
@@ -24,46 +24,37 @@ const OVERFLOW_KEY =
 const OVERFLOW_ANIMATION_KEY =
   "ffe600a8f5c28f5c28f80c28f5c28f5c290c28f5c28f5c290a8f5c28f5c28f800";
 
-Deno.test("animation key clamps colour channels to 0..255 like the browser", async () => {
-  const fixture = await Deno.readTextFile(
+afterEach(() => {
+  mock.restore();
+});
+
+test("animation key clamps colour channels to 0..255 like the browser", async () => {
+  const fixture = await Bun.file(
     new URL("./fixtures/live_page.html", import.meta.url),
-  );
+  ).text();
   const html = fixture.replace(
     /(<meta name="twitter-site-verification" content=")[^"]*(")/,
     `$1${OVERFLOW_KEY}$2`,
   );
-  const document = parseHTML(html).window.document as unknown as Document;
+  const document = parseHTML(html).window.document;
 
   // Serve the indices the captured ondemand file carries, in place of
   // fetching it: [rowIndex, ...keyByteIndices] = [14, 20, 19, 30].
-  const originalFetch = globalThis.fetch;
-  Object.defineProperty(globalThis, "fetch", {
-    configurable: true,
-    writable: true,
-    value: () =>
-      Promise.resolve(
-        new Response("(t[14], 16)(t[20], 16)(t[19], 16)(t[30], 16)"),
-      ),
-  });
-  try {
-    const ct = await ClientTransaction.create(document);
-    const keyBytes = Array.from(decodeBase64(OVERFLOW_KEY));
-    const getAnimationKey = (
-      ct as unknown as {
-        getAnimationKey: (keyBytes: number[], response: Document) => string;
-      }
-    ).getAnimationKey.bind(ct);
-    assertEquals(getAnimationKey(keyBytes, document), OVERFLOW_ANIMATION_KEY);
-  } finally {
-    Object.defineProperty(globalThis, "fetch", {
-      configurable: true,
-      writable: true,
-      value: originalFetch,
-    });
-  }
+  spyOn(globalThis, "fetch").mockResolvedValue(
+    new Response("(t[14], 16)(t[20], 16)(t[19], 16)(t[30], 16)"),
+  );
+
+  const ct = await ClientTransaction.create(document);
+  const keyBytes = Array.from(decodeBase64(OVERFLOW_KEY));
+  const getAnimationKey = (
+    ct as unknown as {
+      getAnimationKey: (keyBytes: number[], response: Document) => string;
+    }
+  ).getAnimationKey.bind(ct);
+  expect(getAnimationKey(keyBytes, document)).toBe(OVERFLOW_ANIMATION_KEY);
 });
 
-Deno.test("matrixNumbers reads the numbers X's script reads from a matrix entry", () => {
+test("matrixNumbers reads the numbers X's script reads from a matrix entry", () => {
   // Expected values follow Chromium's printing of a computed matrix
   // entry (six significant digits) split on /[\d.-]+/g.
   const cases: [number, number[]][] = [
@@ -78,6 +69,6 @@ Deno.test("matrixNumbers reads the numbers X's script reads from a matrix entry"
     [-0, [0]],
   ];
   for (const [input, expected] of cases) {
-    assertEquals(matrixNumbers(input), expected, `matrixNumbers(${input})`);
+    expect(matrixNumbers(input)).toEqual(expected);
   }
 });
